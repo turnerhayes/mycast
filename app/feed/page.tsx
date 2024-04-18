@@ -3,7 +3,7 @@
 import { useAppSelector } from "@/lib/redux/hooks";
 import { Feed } from "@/app/components/Feed";
 import { Typography } from "@mui/material";
-import { getPodcast, getPodcasts } from "@/lib/redux/selectors";
+import { getPodcast } from "@/lib/redux/selectors";
 
 const FeedPage = () => {
     const podcast = useAppSelector((state) => getPodcast(state, {id: 0}));

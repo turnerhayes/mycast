@@ -5,6 +5,7 @@ import { useAppSelector } from "@/lib/redux/hooks";
 import { Feed } from "@/app/components/Feed";
 import { getPodcast, getPodcastEpisode } from "@/lib/redux/selectors";
 import { EpisodeDetail } from "@/app/components/EpisodeDetail";
+import { EpisodeId, PodcastId } from "@/app/podcast";
 
 const EpisodeDetailPage = (
     {
@@ -14,8 +15,8 @@ const EpisodeDetailPage = (
         },
     }: {
         params: {
-            id: number;
-            episodeId: string;
+            id: PodcastId;
+            episodeId: EpisodeId;
         };
     }
 ) => {

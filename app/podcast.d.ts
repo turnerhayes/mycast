@@ -1,5 +1,7 @@
 export type PodcastId = number;
 
+export type EpisodeId = string;
+
 export interface PodcastOwner {
     name: string;
     email?: string;
@@ -18,7 +20,7 @@ export interface PodcastEpisodeEnclosure {
 }
 
 export interface PodcastEpisode {
-    id: string;
+    id: EpisodeId;
     guid?: string;
     title: string;
     description?: string;
@@ -48,4 +50,17 @@ export interface Podcast {
     image?: FeedImage;
     categories: PodcastCategory[];
     episodes: PodcastEpisode[];
+}
+
+export interface PodcastEpisodeProgress {
+    lastListenTime: number;
+    isComplete: boolean;
+}
+
+export interface PodcastProgress {
+    [id: PodcastId]: {
+        episodes: {
+            [episodeId: EpisodeId]: PodcastEpisodeProgress;
+        };
+    };
 }

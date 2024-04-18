@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { Feed } from "@/app/components/Feed";
 import { getPodcast } from "@/lib/redux/selectors";
+import { PodcastId } from "@/app/podcast";
 
 const FeedPage = (
     {
@@ -12,7 +13,7 @@ const FeedPage = (
         },
     }: {
         params: {
-            id: number;
+            id: PodcastId;
         };
     }
 ) => {

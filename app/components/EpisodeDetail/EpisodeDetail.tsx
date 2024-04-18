@@ -1,4 +1,6 @@
-import { useRef } from "react";
+"use client";
+
+import { useCallback, useEffect, useRef } from "react";
 import H5AudioPlayer from "react-h5-audio-player";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -8,6 +10,9 @@ import { EpisodeImage } from "@/app/components/EpisodeImage";
 import { Description } from "@/app/components/Description";
 
 import 'react-h5-audio-player/lib/styles.css';
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { setEpisodeProgress } from "@/lib/redux/slices/podcast";
+import { getEpisodeLastListenTime } from "@/lib/redux/selectors";
 
 export const EpisodeDetail = (
     {
@@ -19,6 +24,40 @@ export const EpisodeDetail = (
     }
 ) => {
     const playerRef = useRef<H5AudioPlayer|null>(null);
+    const dispatch = useAppDispatch();
+
+    const currentEpisodeProgress = useAppSelector((state) => getEpisodeLastListenTime(state, {
+        podcastId: podcast.id,
+        episodeId: episode.id,
+    }));
+
+    let mounted = false;
+    useEffect(() => {
+        if (!mounted) {
+            if (currentEpisodeProgress) {
+                const audioRef = playerRef.current?.audio.current;
+                if (audioRef) {
+                    audioRef.currentTime = currentEpisodeProgress;
+                }
+            }
+        }
+
+        mounted = true;
+    }, [
+        mounted,
+    ]);
+
+    const handleListen = useCallback((event: Event) => {
+        const {currentTime} = event.target as HTMLAudioElement;
+        dispatch(setEpisodeProgress({
+            podcastId: podcast.id,
+            episodeId: episode.id,
+            lastListenTime: currentTime,
+        }));
+    }, [
+        podcast,
+        episode,
+    ]);
 
     return (
         <Stack>
@@ -56,6 +95,7 @@ export const EpisodeDetail = (
                     </>
                 }
                 src={episode.enclosure.url}
+                onListen={handleListen}
             ></AudioPlayer>
         </Stack>
     );

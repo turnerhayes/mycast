@@ -56,7 +56,7 @@ export const Feed = (
                 {
                     podcast.episodes.map((ep) => (
                         <ListItem
-                            key={ep.guid}
+                            key={ep.id}
                         >
                             <EpisodeItem
                                 episode={ep}
