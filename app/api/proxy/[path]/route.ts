@@ -9,7 +9,7 @@ export const config = {
 	},
 }
 
-const USE_LOCAL = true;
+const USE_LOCAL = false;
 
 async function getFeedXML(path: string) {
     if (USE_LOCAL) {
@@ -20,17 +20,16 @@ async function getFeedXML(path: string) {
             headers,
         };
     } else {
-        console.log("Proxy URL:", path);
         const proxyResponse = await fetch(path);
 
         const headers = Object.fromEntries(proxyResponse.headers.entries());
         delete headers["access-control-allow-origin"];
         delete headers["content-encoding"];
-        
-        const responseText = await proxyResponse.text();
 
+        const blob = await proxyResponse.blob();
+        
         return {
-            responseText,
+            blob,
             headers,
         };
     }
@@ -38,9 +37,9 @@ async function getFeedXML(path: string) {
 }
 
 export async function GET(req: NextApiRequest, {params: {path}}: {params: {path: string;}}) {
-    const {responseText, headers} = await getFeedXML(path);
+    const {blob, headers} = await getFeedXML(path);
 
-    return new NextResponse(responseText, {
+    return new NextResponse(blob, {
         headers,
     });
 }

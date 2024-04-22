@@ -1,8 +1,13 @@
+import Stack from "@mui/material/Stack";
+import Container from "@mui/material/Container";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
-import "./globals.css";
+import { AppHeader } from "@/app/components/AppHeader";
 import StoreProvider from "./StoreProvider";
+
+import "./globals.css";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,12 +22,36 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <StoreProvider>
-      <AppRouterCacheProvider>
-        <html lang="en">
-          <body className={inter.className}>{children}</body>
-        </html>
-      </AppRouterCacheProvider>
-    </StoreProvider>
+    <html
+      lang="en"
+    >
+      <body
+        className={inter.className}
+      >
+        <StoreProvider>
+          <AppRouterCacheProvider>
+            <Stack
+              component="main"
+              sx={{
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <AppHeader
+              />
+              <Container
+                sx={{
+                  marginTop: 1,
+                  flexGrow: 1,
+                  overflowY: "auto",
+                }}
+              >
+                {children}
+              </Container>
+            </Stack>
+          </AppRouterCacheProvider>
+        </StoreProvider>
+      </body>
+    </html>
   );
 }

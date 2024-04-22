@@ -13,6 +13,7 @@ import 'react-h5-audio-player/lib/styles.css';
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setEpisodeProgress } from "@/lib/redux/slices/podcast";
 import { getEpisodeLastListenTime } from "@/lib/redux/selectors";
+import { Container } from "@mui/material";
 
 export const EpisodeDetail = (
     {
@@ -70,6 +71,7 @@ export const EpisodeDetail = (
             >
                 <EpisodeImage
                     episode={episode}
+                    podcastId={podcast.id}
                 />
                 <Stack>
                     <Typography
@@ -84,19 +86,26 @@ export const EpisodeDetail = (
                     </Typography>
                 </Stack>
             </Stack>
-            <Description>{
+            <Description
+            >{
                 episode.description ?? ""
             }</Description>
-            <AudioPlayer
-                ref={playerRef}
-                header={
-                    <>
-                        {podcast.title} &mdash; {episode.title}
-                    </>
-                }
-                src={episode.enclosure.url}
-                onListen={handleListen}
-            ></AudioPlayer>
+            <Container
+                sx={{
+                    marginTop: 2,
+                }}
+            >
+                <AudioPlayer
+                    ref={playerRef}
+                    header={
+                        <>
+                            {podcast.title} &mdash; {episode.title}
+                        </>
+                    }
+                    src={episode.enclosure.url}
+                    onListen={handleListen}
+                ></AudioPlayer>
+            </Container>
         </Stack>
     );
 };

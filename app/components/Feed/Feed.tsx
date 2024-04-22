@@ -4,12 +4,13 @@ import Stack from "@mui/material/Stack";
 import List from "@mui/material/List"; 
 import ListItem from "@mui/material/ListItem"; 
 import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import LinkIcon from "@mui/icons-material/Link";
 import { EpisodeItem } from "@/app/components/EpisodeItem";
 import { Podcast } from "@/app/podcast";
-import { Container } from "@mui/material";
+import Link from "next/link";
+import { PodcastImage } from "../PodcastImage";
 
-
-const PODCAST_IMAGE_SIZE = 250;
 
 export const Feed = (
     {
@@ -19,38 +20,38 @@ export const Feed = (
     }
 ) => {
     return (
-        <div>
+        <Stack>
             <Stack
                 direction="row"
             >
-                <Container
+                <PodcastImage
+                    podcast={podcast}
+                />
+                <Stack
                     sx={{
-                        width: PODCAST_IMAGE_SIZE,
-                        minWidth: PODCAST_IMAGE_SIZE,
-                        height: PODCAST_IMAGE_SIZE,
+                        marginLeft: 1,
                     }}
                 >
+                    <Typography
+                        variant="h2"
+                    >
+                        {podcast.title}
+                    </Typography>
                     {
-                        podcast.image ? (
-                            <img
-                                src={podcast.image.url}
-                                alt={podcast.image.title ?? `Image for ${podcast.title} podcast`}
-                                title={podcast.image.title}
-                                style={{
-                                    width: "100%",
+                        podcast.image?.link ? (
+                            <IconButton
+                                LinkComponent={Link}
+                                href={podcast.image.link}
+                                target="_blank"
+                                sx={{
+                                    alignSelf: "start",
                                 }}
-                            />
-                        ) : (
-                            <div>
-                            </div>
-                        )
+                            >
+                                <LinkIcon />
+                            </IconButton>
+                        ) : null
                     }
-                </Container>
-                <Typography
-                    variant="h2"
-                >
-                    {podcast.title}
-                </Typography>
+                </Stack>
             </Stack>
             <List>
                 {
@@ -66,6 +67,6 @@ export const Feed = (
                     ))
                 }
             </List>
-        </div>
+        </Stack>
     );
 };

@@ -32,6 +32,16 @@ const getEpisodeProgress = createSelector(
         episodes[episodeId]
 );
 
+export const getPodcastEpisodeProgress = createSelector(
+    [
+        (state: RootState) => state.podcast.podcastProgress,
+        (state: RootState, params: {
+            podcastId: PodcastId;
+        }) => params.podcastId,
+    ],
+    (progress, podcastId) => progress[podcastId]
+);
+
 export const getEpisodeLastListenTime = createSelector(
     [
         getEpisodeProgress,

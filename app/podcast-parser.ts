@@ -180,12 +180,8 @@ class PodcastParser {
             "length",
             episodeNode
         );
-        if (lengthString === "") {
-            throw new Error(
-                "No length attribute for enclosure found for episode"
-            );
-        }
-        const length = Number(lengthString);
+        
+        const length = lengthString ? Number(lengthString) : undefined;
 
         const type = this.getAttribute("enclosure", "type", episodeNode);
         if (!type) {

@@ -14,7 +14,7 @@ export interface FeedImage {
 }
 
 export interface PodcastEpisodeEnclosure {
-    length: number;
+    length?: number;
     type: string;
     url: string;
 }

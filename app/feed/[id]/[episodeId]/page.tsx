@@ -20,8 +20,6 @@ const EpisodeDetailPage = (
         };
     }
 ) => {
-    console.log("Podcast ID:", id);
-    console.log("Episode ID:", episodeId)
     const podcast = useAppSelector((state) => getPodcast(state, {id}));
     const episode = useAppSelector((state) => getPodcastEpisode(state, {id, episodeId}));
 

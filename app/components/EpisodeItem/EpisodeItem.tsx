@@ -1,11 +1,11 @@
+import { ReactNode } from "react";
 import Link from "next/link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import MuiLink from "@mui/material/Link";
 import { Description } from "@/app/components/Description";
 import { PodcastEpisode, PodcastId } from "@/app/podcast";
-import { EpisodeImage } from "../EpisodeImage/EpisodeImage";
-import { ReactNode } from "react";
+import { EpisodeImage } from "@/app/components/EpisodeImage";
 
 
 interface EpisodeItemProps {
@@ -46,9 +46,10 @@ export const EpisodeItem = (
                 <EpisodeLink
                     podcastId={podcastId}
                     episode={episode}
-                >
+                    >
                     <EpisodeImage
                         episode={episode}
+                        podcastId={podcastId}
                     />
                 </EpisodeLink>
                 <Stack>

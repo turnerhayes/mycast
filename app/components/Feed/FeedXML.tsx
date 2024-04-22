@@ -15,7 +15,7 @@ const FeedXML = () => {
     let ignore = false;
     useEffect(() => {
         if (!ignore) {
-            const url = "https://feeds.npr.org/344098539/podcast.xml";
+            const url = "https://www.dimsdale.co.uk/rss/tubt";
             getFeedText(url).then((xml) => {
                 setXml(xml);
             });
