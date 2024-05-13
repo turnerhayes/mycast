@@ -84,9 +84,9 @@ const getBreadcrumbItems = (layoutSegments: string[], state: RootState): Breadcr
         }
         const [_, podcastId, episodeId] = layoutSegments;
 
-        const podcast = getPodcast(state, {id: Number(podcastId),});
+        const podcast = getPodcast(state, {id: podcastId,});
         const episode = episodeId ? getPodcastEpisode(state, {
-            id: Number(podcastId),
+            id: podcastId,
             episodeId,
         }) : undefined;
 

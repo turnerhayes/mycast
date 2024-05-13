@@ -22,7 +22,7 @@ const FeedXML = () => {
 
             parseFeed(url).then((podcastWithoutId) => {
                 const podcast: Podcast = {
-                    id: 0,
+                    id: "0",
                     ...podcastWithoutId
                 }
                 dispatch(addPodcast(podcast));

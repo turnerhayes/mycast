@@ -7,6 +7,7 @@ import { AppHeader } from "@/app/components/AppHeader";
 import StoreProvider from "./StoreProvider";
 
 import "./globals.css";
+import { App } from "./App";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -30,25 +31,27 @@ export default function RootLayout({
       >
         <StoreProvider>
           <AppRouterCacheProvider>
-            <Stack
-              component="main"
-              sx={{
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              <AppHeader
-              />
-              <Container
+            <App>
+              <Stack
+                component="main"
                 sx={{
-                  marginTop: 1,
-                  flexGrow: 1,
-                  overflowY: "auto",
+                  width: "100%",
+                  height: "100%",
                 }}
               >
-                {children}
-              </Container>
-            </Stack>
+                <AppHeader
+                />
+                <Container
+                  sx={{
+                    marginTop: 1,
+                    flexGrow: 1,
+                    overflowY: "auto",
+                  }}
+                >
+                  {children}
+                </Container>
+              </Stack>
+            </App>
           </AppRouterCacheProvider>
         </StoreProvider>
       </body>

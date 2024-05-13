@@ -7,15 +7,15 @@ export const getPodcasts = (state: RootState) => state.podcast.items;
 export const getPodcast = createSelector(
     [
         getPodcasts,
-        (state: RootState, params: {id: number;}) => params.id,
+        (state: RootState, params: {id: PodcastId;}) => params.id,
     ],
-    (podcasts, id) => podcasts[id]
+    (podcasts, id) => podcasts.find((podcast) => podcast.id === id)
 );
 
 export const getPodcastEpisode = createSelector(
     [
         getPodcast,
-        (state: RootState, params: {episodeId: string;}) => params.episodeId,
+        (state: RootState, params: {episodeId: EpisodeId;}) => params.episodeId,
     ],
     (podcast, episodeId) => podcast?.episodes.find((ep) => ep.id === episodeId)
 );

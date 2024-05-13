@@ -31,7 +31,7 @@ export default function StoreProvider({
             ) >= 0;
             if (!exists) {
               const podcast: Podcast = {
-                id: podcasts.length,
+                id: "" + podcasts.length,
                 ...podcastWithoutId,
               }
               store.dispatch(addPodcast(podcast));
@@ -54,10 +54,10 @@ export default function StoreProvider({
         };
 
         const subscribeHandler = () => {
-          // if (store.getState()._persist.rehydrated) {
-          //   const podcasts = getPodcasts(store.getState());
-          //   setInitialStateIfNeeded(podcasts);
-          // }
+          if (store.getState()._persist.rehydrated) {
+            const podcasts = getPodcasts(store.getState());
+            setInitialStateIfNeeded(podcasts);
+          }
           unsubscribe();
         };
         

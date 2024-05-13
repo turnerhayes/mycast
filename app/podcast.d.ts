@@ -1,4 +1,4 @@
-export type PodcastId = number;
+export type PodcastId = string;
 
 export type EpisodeId = string;
 
