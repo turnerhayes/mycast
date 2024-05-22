@@ -1,6 +1,7 @@
 import { ReactElement, createElement } from "react";
-import { Link } from "@mui/material";
 import NextLink from "next/link";
+import Link from "@mui/material/Link";
+import Typography, {TypographyProps} from "@mui/material/Typography";
 
 const BANNED_TAGS = [
     "script",
@@ -73,16 +74,21 @@ const processHTML = (node: Node): Child[] => {
 export const Description = (
     {
         children,
+        typographyProps,
     }: {
         children: string;
+        typographyProps?: TypographyProps;
     }
 ) => {
     const parser = new DOMParser();
     const parsed = parser.parseFromString(children, "text/html");
 
     return (
-        <div>
+        <Typography
+            component="div"
+            {...typographyProps}
+        >
             {processHTML(parsed.body)}
-        </div>
+        </Typography>
     );
 };
