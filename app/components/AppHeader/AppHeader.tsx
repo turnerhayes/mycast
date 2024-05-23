@@ -1,17 +1,28 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ChangeEvent, FormEvent, ReactNode, useCallback, useEffect, useState } from "react";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import MuiLink from "@mui/material/Link";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box"; 
+import InputAdornment from "@mui/material/InputAdornment"; 
+import TextField from "@mui/material/TextField"; 
+import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/material";
 import PodcastsIcon from "@mui/icons-material/Podcasts";
-import { useSelectedLayoutSegments } from "next/navigation";
+import SearchIcon from "@mui/icons-material/Search";
+import {
+    ReadonlyURLSearchParams,
+    useRouter,
+    useSearchParams,
+    useSelectedLayoutSegment,
+    useSelectedLayoutSegments,
+} from "next/navigation";
 import Link from "next/link";
 import { useAppStore } from "@/lib/redux/hooks";
 import { RootState } from "@/lib/redux/store";
 import { getPodcast, getPodcastEpisode } from "@/lib/redux/selectors";
-import { Typography, useTheme } from "@mui/material";
 
 
 const BreadcrumbLink = (
@@ -72,7 +83,11 @@ const BreadcrumbComponent = (
     );
 };
 
-const getBreadcrumbItems = (layoutSegments: string[], state: RootState): BreadcrumbItem[] => {
+const getBreadcrumbItems = (
+    layoutSegments: string[],
+    state: RootState,
+    searchParams: ReadonlyURLSearchParams
+): BreadcrumbItem[] => {
     if (layoutSegments[0] === "feed") {
         if (layoutSegments[1] === "xml") {
             return [
@@ -85,6 +100,10 @@ const getBreadcrumbItems = (layoutSegments: string[], state: RootState): Breadcr
         const [_, podcastId, episodeId] = layoutSegments;
 
         const podcast = getPodcast(state, {id: podcastId,});
+
+        if (!podcast) {
+            throw new Error(`No podcast with id ${podcastId}`);
+        }
         const episode = episodeId ? getPodcastEpisode(state, {
             id: podcastId,
             episodeId,
@@ -109,19 +128,61 @@ const getBreadcrumbItems = (layoutSegments: string[], state: RootState): Breadcr
         return items;
     }
 
+    if (layoutSegments[0] === "search") {
+        return [
+            {
+                text: "Search",
+                href: `/search?${searchParams}`
+            }
+        ];
+    }
+
     return [];
 };
 
 export const AppHeader = () => {
+    const [searchString, setSearchString] = useState("");
+
+    const router = useRouter();
     const state = useAppStore().getState();
     const segments = useSelectedLayoutSegments();
+    
+    const searchParams = useSearchParams();
+    const segment = useSelectedLayoutSegment();
+    useEffect(() => {
+        if (segment !== "search") {
+            return;
+        }
+        const query = searchParams.get("q");
+        if (query) {
+            setSearchString(query);
+        }
+    }, [
+        setSearchString,
+        segment,
+        searchParams,
+    ]);
 
-    const breadcrumbItems = getBreadcrumbItems(segments, state);
+    const breadcrumbItems = getBreadcrumbItems(segments, state, searchParams);
 
     breadcrumbItems.unshift({
         text: "Home",
         href: "/",
     });
+
+    const handleSearchSubmit = useCallback((event: FormEvent) => {
+        event.preventDefault();
+        router.push(`/search?q=${encodeURIComponent(searchString)}`);
+    }, [
+        searchString,
+        router,
+    ]);
+
+    const handleSearchFieldChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        setSearchString(event.target.value);
+    }, [
+        setSearchString,
+    ]);
 
     return (
         <AppBar
@@ -146,6 +207,31 @@ export const AppHeader = () => {
                         )
                     }
                 </Breadcrumbs>
+                <Box
+                    sx={{
+                        marginLeft: "auto",
+                    }}
+                >
+                    <form
+                        action="/search"
+                        onSubmit={handleSearchSubmit}
+                    >
+                        <TextField
+                            size="small"
+                            placeholder="Search podcasts"
+                            name="q"
+                            value={searchString}
+                            onChange={handleSearchFieldChange}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <SearchIcon />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                    </form>
+                </Box>
             </Toolbar>
         </AppBar>
     );

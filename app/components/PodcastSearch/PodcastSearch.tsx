@@ -1,7 +1,6 @@
 "use client";
 
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import TextField from "@mui/material/TextField";
+import { useCallback, useState } from "react";
 import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
 import Box from "@mui/material/Box";
@@ -14,10 +13,10 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import { PodcastSearchResult, useSearchPodcasts } from "@/app/data/podcast_search";
-import {parseFeed} from "@/app/podcast-parser";
+import { parseFeed } from "@/app/podcast-parser";
 import { addPodcast } from "@/lib/redux/slices/podcast";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { getPodcast, getPodcastByFeedUrl } from "@/lib/redux/selectors";
+import { getPodcastByFeedUrl } from "@/lib/redux/selectors";
 import { Description } from "@/app/components/Description";
 
 
@@ -151,7 +150,7 @@ const SearchResultItem = (
     );
 };
 
-const SearchResults = (
+export const SearchResults = (
     {
         searchString,
     }: {
@@ -161,8 +160,6 @@ const SearchResults = (
     const results = useSearchPodcasts({
         searchString,
     });
-
-    console.log("results:", results);
 
     const [adding, setAdding] = useState<string[]>([]);
     const [expandedResult, setExpandedResult] = useState<PodcastSearchResult|null>(null);
@@ -177,7 +174,7 @@ const SearchResults = (
         ]);
         const podcastWithoutId = await parseFeed(result.rssUrl);
         const podcast = {
-            id: result.rssUrl,
+            id: result.uuid,
             ...podcastWithoutId,
         };
         console.log("finished parsing podcast");
@@ -212,48 +209,4 @@ const SearchResults = (
             }
         </List>
     );
-};
-
-export const PodcastSearch = () => {
-    const [searchString, setSearchString] = useState("");
-    const handleSearchFieldChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-        setSearchString(event.target.value);
-    }, [
-        setSearchString,
-    ]);
-
-    // DEBUG
-    useEffect(() => {
-        handleSearchFieldChange({target: {value: "wait"}} as ChangeEvent<HTMLInputElement>);
-    }, []);
-    // END DEBUG
-
-    return (
-        <Stack
-            sx={{
-                height: "100%",
-            }}
-        >
-            <TextField
-                label="Search for podcasts"
-                onChange={handleSearchFieldChange}
-                value={searchString}
-                margin="dense"
-            />
-            {
-                searchString ? (
-                    <Box
-                        sx={{
-                            flex: 1,
-                            overflowY: "auto",
-                        }}
-                    >
-                        <SearchResults
-                            searchString={searchString}
-                        />
-                    </Box>
-                ) : null
-            }
-        </Stack>
-    )
 };

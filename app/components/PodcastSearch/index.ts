@@ -1,1 +1,1 @@
-export { PodcastSearch } from "./PodcastSearch";
+export { SearchResults } from "./PodcastSearch";
