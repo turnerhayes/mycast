@@ -31,8 +31,7 @@ export default function StoreProvider({
             ) >= 0;
             if (!exists) {
               const podcast: Podcast = {
-                // id: "" + podcasts.length,
-                id: url,
+                id: "" + podcasts.length,
                 ...podcastWithoutId,
               }
               store.dispatch(addPodcast(podcast));

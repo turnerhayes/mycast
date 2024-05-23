@@ -41,6 +41,7 @@ export interface PodcastCategory {
 export interface Podcast {
     id: PodcastId;
     url: string;
+    feedUrl: string;
     title: string;
     author?: string;
     owner?: PodcastOwner;

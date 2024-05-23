@@ -15,11 +15,14 @@ export type PodcastWithoutId = Omit<Podcast, "id">;
 class PodcastParser {
     private parser = new DOMParser();
 
+    private feedUrl: string;
+
     private feed: Document;
 
     private resolver: XPathNSResolver;
 
-    constructor(feedText: string) {
+    constructor(feedText: string, feedUrl: string) {
+        this.feedUrl = feedUrl;
         this.feed = this.parser.parseFromString(feedText, "application/xml");
         this.resolver = globalThis.document.createNSResolver(this.feed.documentElement);
     }
@@ -66,6 +69,7 @@ class PodcastParser {
         
         const podcast: PodcastWithoutId = {
             url: url!,
+            feedUrl: this.feedUrl,
             title: title!,
             author,
             owner,
@@ -342,5 +346,5 @@ class PodcastParser {
 
 export const parseFeed = async (path: string) => {
     const feedText = await getFeedText(path);
-    return new PodcastParser(feedText).parse();
+    return new PodcastParser(feedText, path).parse();
 };

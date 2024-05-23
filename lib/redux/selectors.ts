@@ -12,6 +12,14 @@ export const getPodcast = createSelector(
     (podcasts, id) => podcasts.find((podcast) => podcast.id === id)
 );
 
+export const getPodcastByFeedUrl = createSelector(
+    [
+        getPodcasts,
+        (state: RootState, params: {url: string;}) => params.url,
+    ],
+    (podcasts, url) => podcasts.find((podcast) => podcast.feedUrl === url)
+);
+
 export const getPodcastEpisode = createSelector(
     [
         getPodcast,

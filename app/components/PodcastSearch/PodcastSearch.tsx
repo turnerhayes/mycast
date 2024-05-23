@@ -3,8 +3,10 @@
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
-import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
+import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
+import Typography from "@mui/material/Typography";
 import ListItemButton from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
@@ -15,9 +17,7 @@ import { PodcastSearchResult, useSearchPodcasts } from "@/app/data/podcast_searc
 import {parseFeed} from "@/app/podcast-parser";
 import { addPodcast } from "@/lib/redux/slices/podcast";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { getPodcast } from "@/lib/redux/selectors";
-import { Box, Collapse, Typography } from "@mui/material";
-import { KeyboardArrowDown } from "@mui/icons-material";
+import { getPodcast, getPodcastByFeedUrl } from "@/lib/redux/selectors";
 import { Description } from "@/app/components/Description";
 
 
@@ -62,7 +62,7 @@ const SearchResultItem = (
     }
 ) => {
     const hasPodcast = useAppSelector(
-        (state) => getPodcast(state, {id: result.rssUrl,})
+        (state) => getPodcastByFeedUrl(state, {url: result.rssUrl,})
     ) != null;
     const handleAddClick = useCallback(() => {
         onAdd(result);
