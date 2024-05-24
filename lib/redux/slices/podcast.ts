@@ -20,8 +20,10 @@ const podcastSlice = createSlice({
             state.items.push(payload);
         },
 
-        removePodcast(state, {payload}: PayloadAction<Podcast>) {
-            const i = state.items.findIndex((podcast) => payload.url === podcast.url);
+        removePodcast(state, {payload}: PayloadAction<{
+            feedUrl: string;
+        }>) {
+            const i = state.items.findIndex((podcast) => payload.feedUrl === podcast.feedUrl);
             if (i >= 0) {
                 state.items.splice(i, 1);
             }

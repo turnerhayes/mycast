@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { MouseEvent, useCallback, useState } from "react";
 import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
 import Box from "@mui/material/Box";
@@ -9,16 +9,72 @@ import Typography from "@mui/material/Typography";
 import ListItemButton from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
+import { styled } from "@mui/material/styles";
 import LoadingButton from "@mui/lab/LoadingButton";
-import AddIcon from "@mui/icons-material/Add";
+import AddIcon from "@mui/icons-material/AddCircle";
+import RemoveIcon from "@mui/icons-material/RemoveCircle";
 import CheckIcon from "@mui/icons-material/Check";
 import { PodcastSearchResult, useSearchPodcasts } from "@/app/data/podcast_search";
 import { parseFeed } from "@/app/podcast-parser";
-import { addPodcast } from "@/lib/redux/slices/podcast";
+import { addPodcast, removePodcast } from "@/lib/redux/slices/podcast";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { getPodcastByFeedUrl } from "@/lib/redux/selectors";
 import { Description } from "@/app/components/Description";
+import { IconButton } from "@mui/material";
 
+
+const ChangeOnHover = styled('div')({
+    '&:not(:hover) > .hovered': {
+        display: 'none',
+    },
+
+    '&:hover': {
+        '> :not(.hovered)': {
+            display: 'none',
+        }
+    }
+})
+
+const ExistingPodcastIcon = (
+    {
+        result,
+        onRemove,
+    }: {
+        result: PodcastSearchResult;
+        onRemove: (result: PodcastSearchResult) => void;
+    }
+) => {
+    const handleRemoveClick = useCallback((event: MouseEvent) => {
+        event.stopPropagation();
+        onRemove(result);
+    }, [
+        result,
+        onRemove,
+    ]);
+
+    return (
+        <ChangeOnHover
+        >
+            <CheckIcon
+                color="success"
+                sx={{
+                    marginRight: 2.5,
+                }}
+            />
+            <IconButton
+                className="hovered"
+                onClick={handleRemoveClick}
+                sx={{
+                    marginRight: 1.5,
+                }}
+            >
+                <RemoveIcon
+                    color="error"
+                />
+            </IconButton>
+        </ChangeOnHover>
+    );
+};
 
 const SearchResultItemDetails = (
     {
@@ -49,12 +105,14 @@ const SearchResultItem = (
     {
         result,
         onAdd,
+        onRemove,
         isExpanded,
         onToggleExpanded,
         loading,
     }: {
         result: PodcastSearchResult;
         onAdd: (result: PodcastSearchResult) => void;
+        onRemove: (result: PodcastSearchResult) => void;
         isExpanded: boolean;
         onToggleExpanded: (result: PodcastSearchResult) => void;
         loading: boolean;
@@ -63,7 +121,8 @@ const SearchResultItem = (
     const hasPodcast = useAppSelector(
         (state) => getPodcastByFeedUrl(state, {url: result.rssUrl,})
     ) != null;
-    const handleAddClick = useCallback(() => {
+    const handleAddClick = useCallback((event: MouseEvent) => {
+        event.stopPropagation();
         onAdd(result);
     }, [
         onAdd,
@@ -94,16 +153,6 @@ const SearchResultItem = (
                     height={50}
                 />
             </ListItemAvatar>
-            {/* <Accordion>
-                <AccordionSummary>
-                    {result.name}
-                </AccordionSummary>
-                <AccordionDetails>
-                    <SearchResultItemDetails
-                        result={result}
-                    />
-                </AccordionDetails>
-            </Accordion> */}
             <ListItemText>
                 {result.name}
                 <Collapse
@@ -121,11 +170,9 @@ const SearchResultItem = (
             >
                 {
                     hasPodcast ? (
-                        <CheckIcon
-                            color="success"
-                            sx={{
-                                marginRight: 2.5,
-                            }}
+                        <ExistingPodcastIcon
+                            result={result}
+                            onRemove={onRemove}
                         />
                     ) : (
                         <LoadingButton
@@ -137,15 +184,6 @@ const SearchResultItem = (
                     )
                 }
             </Box>
-            {/* <ListItemText
-                secondary={
-                    <SearchResultItemDetails
-                        result={result}
-                    />
-                }
-            >
-                {result.name}
-            </ListItemText> */}
         </ListItemButton>
     );
 };
@@ -161,15 +199,15 @@ export const SearchResults = (
         searchString,
     });
 
-    const [adding, setAdding] = useState<string[]>([]);
+    const [processing, setProcessing] = useState<string[]>([]);
     const [expandedResult, setExpandedResult] = useState<PodcastSearchResult|null>(null);
 
     const dispatch = useAppDispatch();
 
 
     const handleAddClick = useCallback(async (result: PodcastSearchResult) => {
-        setAdding([
-            ...adding,
+        setProcessing([
+            ...processing,
             result.uuid,
         ]);
         const podcastWithoutId = await parseFeed(result.rssUrl);
@@ -179,11 +217,19 @@ export const SearchResults = (
         };
         console.log("finished parsing podcast");
         dispatch(addPodcast(podcast));
-        setAdding(adding.filter((id) => id !== result.uuid));
+        setProcessing(processing.filter((id) => id !== result.uuid));
     }, [
         dispatch,
-        setAdding,
-        adding,
+        setProcessing,
+        processing,
+    ]);
+
+    const handleRemoveClick = useCallback((result: PodcastSearchResult) => {
+        dispatch(removePodcast({
+            feedUrl: result.rssUrl,
+        }));
+    }, [
+        dispatch,
     ]);
 
     const handleToggleResultExpanded = useCallback((result: PodcastSearchResult) => {
@@ -201,9 +247,10 @@ export const SearchResults = (
                         key={result.uuid}
                         result={result}
                         onAdd={handleAddClick}
+                        onRemove={handleRemoveClick}
                         isExpanded={expandedResult?.rssUrl === result.rssUrl}
                         onToggleExpanded={handleToggleResultExpanded}
-                        loading={adding.includes(result.uuid)}
+                        loading={processing.includes(result.uuid)}
                     />
                 ))
             }
