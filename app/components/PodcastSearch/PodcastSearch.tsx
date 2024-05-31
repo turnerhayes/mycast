@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import ListItemButton from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
-import { styled } from "@mui/material/styles";
+import IconButton from "@mui/material/IconButton";
 import LoadingButton from "@mui/lab/LoadingButton";
 import AddIcon from "@mui/icons-material/AddCircle";
 import RemoveIcon from "@mui/icons-material/RemoveCircle";
@@ -20,20 +20,8 @@ import { addPodcast, removePodcast } from "@/lib/redux/slices/podcast";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { getPodcastByFeedUrl } from "@/lib/redux/selectors";
 import { Description } from "@/app/components/Description";
-import { IconButton } from "@mui/material";
+import { ChangeOnHover } from "@/app/components/ChangeOnHover";
 
-
-const ChangeOnHover = styled('div')({
-    '&:not(:hover) > .hovered': {
-        display: 'none',
-    },
-
-    '&:hover': {
-        '> :not(.hovered)': {
-            display: 'none',
-        }
-    }
-})
 
 const ExistingPodcastIcon = (
     {

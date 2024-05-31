@@ -26,7 +26,7 @@ const EpisodeLink = (
 ) => (
     <MuiLink
         component={Link}
-        href={`/feed/${podcastId}/${episode.guid}`}
+        href={`/feed/${encodeURIComponent(podcastId)}/${encodeURIComponent(episode.id)}`}
     >
         {children}
     </MuiLink>

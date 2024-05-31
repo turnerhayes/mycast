@@ -4,10 +4,10 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AppHeader } from "@/app/components/AppHeader";
-import StoreProvider from "./StoreProvider";
+import StoreProvider from "@/app/StoreProvider";
+import { App } from "@/app/App";
 
 import "./globals.css";
-import { App } from "./App";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -32,25 +32,7 @@ export default function RootLayout({
         <StoreProvider>
           <AppRouterCacheProvider>
             <App>
-              <Stack
-                component="main"
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                <AppHeader
-                />
-                <Container
-                  sx={{
-                    marginTop: 1,
-                    flexGrow: 1,
-                    overflowY: "auto",
-                  }}
-                >
-                  {children}
-                </Container>
-              </Stack>
+              {children}
             </App>
           </AppRouterCacheProvider>
         </StoreProvider>

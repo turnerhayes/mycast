@@ -43,7 +43,7 @@ export default function StoreProvider({
           const urls = [
             "https://feeds.npr.org/344098539/podcast.xml",
             "https://www.patreon.com/rss/qanonanonymous?auth=_JuW9d71rN4ESHfw7sKhdBsJCfupplPy",
-            "https://www.dimsdale.co.uk/rss/tubt",
+            "https://feeds.feedburner.com/tubt",
           ];
 
           if (podcasts.length < urls.length) {

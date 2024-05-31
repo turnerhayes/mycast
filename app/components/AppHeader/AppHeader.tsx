@@ -1,17 +1,6 @@
 "use client";
 
 import { ChangeEvent, FormEvent, ReactNode, useCallback, useEffect, useState } from "react";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
-import MuiLink from "@mui/material/Link";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Box from "@mui/material/Box"; 
-import InputAdornment from "@mui/material/InputAdornment"; 
-import TextField from "@mui/material/TextField"; 
-import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/material";
-import PodcastsIcon from "@mui/icons-material/Podcasts";
-import SearchIcon from "@mui/icons-material/Search";
 import {
     ReadonlyURLSearchParams,
     useRouter,
@@ -19,10 +8,20 @@ import {
     useSelectedLayoutSegment,
     useSelectedLayoutSegments,
 } from "next/navigation";
-import Link from "next/link";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box"; 
+import InputAdornment from "@mui/material/InputAdornment"; 
+import TextField from "@mui/material/TextField"; 
+import Typography from "@mui/material/Typography";
+import { IconButton, SxProps, useTheme } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useAppStore } from "@/lib/redux/hooks";
 import { RootState } from "@/lib/redux/store";
 import { getPodcast, getPodcastEpisode } from "@/lib/redux/selectors";
+import { BaseLink } from "../Links";
 
 
 const BreadcrumbLink = (
@@ -30,21 +29,26 @@ const BreadcrumbLink = (
         children,
         href,
         color,
+        title,
+        sx,
     }: {
         children: ReactNode;
         href: string;
         color: string;
+        title?: string;
+        sx?: SxProps;
     }
 ) => {
     return (
-        <MuiLink
-            component={Link}
+        <BaseLink
             href={href}
             color={color}
             variant="body2"
+            title={title}
+            sx={sx}
         >
             {children}
-        </MuiLink>
+        </BaseLink>
     );
 };
 
@@ -64,22 +68,40 @@ const BreadcrumbComponent = (
 ) => {
     const theme = useTheme();
 
+    const sx: SxProps = {
+        maxWidth: 200,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+    };
+
     return (
-        isLast ? (
-            <Typography
-                variant="body1"
-                color={theme.palette.primary.contrastText}
-            >
-                {item.text}
-            </Typography>
-        ) : (
-            <BreadcrumbLink
-                href={item.href}
-                color={theme.palette.primary.contrastText}
-            >
-                {item.text}
-            </BreadcrumbLink>
-        )
+        <Box>
+            {
+                isLast ? (
+                    <Typography
+                        variant="body1"
+                        color={theme.palette.primary.contrastText}
+                        title={item.text}
+                        sx={sx}
+                    >
+                        {item.text}
+                    </Typography>
+                ) : (
+                    <BreadcrumbLink
+                        href={item.href}
+                        color={theme.palette.primary.contrastText}
+                        title={item.text}
+                        sx={{
+                            ...sx,
+                            display: "inline-block",
+                        }}
+                    >
+                        {item.text}
+                    </BreadcrumbLink>
+                )
+            }
+        </Box>
     );
 };
 
@@ -97,7 +119,10 @@ const getBreadcrumbItems = (
                 },
             ];
         }
-        const [_, podcastId, episodeId] = layoutSegments;
+        const podcastId = decodeURIComponent(layoutSegments[1]);
+        const episodeId = layoutSegments[2] ?
+            decodeURIComponent(layoutSegments[2]) :
+            undefined;
 
         const podcast = getPodcast(state, {id: podcastId,});
 
@@ -116,6 +141,8 @@ const getBreadcrumbItems = (
             },
         ];
 
+        console.log("layout segments:", layoutSegments);
+
         if (episode) {
             items.push(
                 {
@@ -133,14 +160,29 @@ const getBreadcrumbItems = (
             {
                 text: "Search",
                 href: `/search?${searchParams}`
-            }
+            },
+        ];
+    }
+
+    if (layoutSegments[0] === "downloads") {
+        return [
+            {
+                text: "Downloads",
+                href: "/downloads",
+            },
         ];
     }
 
     return [];
 };
 
-export const AppHeader = () => {
+export const AppHeader = (
+    {
+        onToggleMenu,
+    }: {
+        onToggleMenu: () => void;
+    }
+) => {
     const [searchString, setSearchString] = useState("");
 
     const router = useRouter();
@@ -191,7 +233,11 @@ export const AppHeader = () => {
             <Toolbar
                 variant="dense"
             >
-                <PodcastsIcon />
+                <IconButton
+                    onClick={onToggleMenu}
+                >
+                    <MenuIcon />
+                </IconButton>
                 <Breadcrumbs>
                     {
                         breadcrumbItems.map(

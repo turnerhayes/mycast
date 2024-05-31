@@ -1,7 +1,6 @@
 import { ReactElement, createElement } from "react";
-import NextLink from "next/link";
-import Link from "@mui/material/Link";
 import Typography, {TypographyProps} from "@mui/material/Typography";
+import { BaseLink } from "../Links";
 
 const BANNED_TAGS = [
     "script",
@@ -46,15 +45,14 @@ const processHTML = (node: Node): Child[] => {
 
         if (nodeName === "a") {
             newChild = (
-                <Link
+                <BaseLink
                     key={key}
-                    component={NextLink}
                     {...attributes}
                     target="_blank"
                     href={attributes.href as string ?? ""}
                 >
                     {grandchildren}
-                </Link>
+                </BaseLink>
             );
         }
         else {

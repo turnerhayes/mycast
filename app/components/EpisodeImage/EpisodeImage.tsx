@@ -1,6 +1,7 @@
 import Container from "@mui/material/Container";
 import MicrophoneIcon from "@mui/icons-material/Mic";
 import { PodcastEpisode, PodcastId } from "@/app/podcast";
+import { SxProps } from "@mui/material";
 
 const EPISODE_IMAGE_SIZE = 150;
 
@@ -8,18 +9,13 @@ export const EpisodeImage = (
     {
         episode,
         podcastId,
+        sx,
     }: {
         episode: PodcastEpisode;
         podcastId: PodcastId;
+        sx?: SxProps;
     }
 ) => {
-    // const progress = useAppSelector((state) => getEpisodeLastListenTime(state, {
-    //     episodeId: episode.id,
-    //     podcastId: podcastId,
-    // }));
-
-    // const progressPercent =  (progress || 0) * 100 / episode.enclosure.length;
-
     return (
         <Container
             sx={{
@@ -29,34 +25,9 @@ export const EpisodeImage = (
                 marginRight: 1,
                 marginLeft: 0,
                 padding: [0],
-                // position: "relative",
+                ...sx,
             }}
         >
-            {/* <Box
-                sx={{
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 0,
-                    position: "absolute",
-                    zIndex: 1,
-                }}
-            >
-                <svg width="100%" height="100%" viewBox="0 0 100 100">
-                    <circle
-                        cx={50}
-                        cy={50}
-                        r={50}
-                        strokeWidth={100}
-                        strokeDasharray={`${progressPercent} ${100 - progressPercent}`}
-                        strokeDashoffset={25}
-                        pathLength={100}
-                        fill="transparent"
-                        stroke="#0000008E"
-                        clipPath="circle() fill-box"
-                    />
-                </svg>
-            </Box> */}
             {
                 episode.imageUrl ? (
                     <img

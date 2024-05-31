@@ -9,37 +9,14 @@ export const config = {
 	},
 }
 
-const USE_LOCAL = false;
-
-async function getFeedXML(path: string) {
-    if (USE_LOCAL) {
-        const headers = {};
-        const responseText = await fs.readFile(process.cwd() + '/app/wait_wait_podcast.xml', 'utf8');
-        return {
-            responseText,
-            headers,
-        };
-    } else {
-        const proxyResponse = await fetch(path);
-
-        const headers = Object.fromEntries(proxyResponse.headers.entries());
-        delete headers["access-control-allow-origin"];
-        delete headers["content-encoding"];
-
-        const blob = await proxyResponse.blob();
-        
-        return {
-            blob,
-            headers,
-        };
-    }
-
-}
-
 export async function GET(req: NextApiRequest, {params: {path}}: {params: {path: string;}}) {
-    const {blob, headers} = await getFeedXML(path);
+    const response = await fetch(path);
 
-    return new NextResponse(blob, {
+    const headers = Object.fromEntries(response.headers.entries());
+    delete headers["access-control-allow-origin"];
+    delete headers["content-encoding"];
+
+    return new NextResponse(response.body, {
         headers,
     });
 }
