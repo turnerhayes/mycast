@@ -1,11 +1,14 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import MuiLink from "@mui/material/Link";
+import Badge from "@mui/material/Badge";
+import DownloadDoneIcon from "@mui/icons-material/DownloadDone";
 import { Description } from "@/app/components/Description";
 import { PodcastEpisode, PodcastId } from "@/app/podcast";
 import { EpisodeImage } from "@/app/components/EpisodeImage";
+import { getEpisodeAudioFromFile } from "@/app/filesystem";
 
 
 interface EpisodeItemProps {
@@ -38,6 +41,27 @@ export const EpisodeItem = (
         podcastId,
     }: EpisodeItemProps
 ) => {
+    const [isDownloaded, setIsDownloaded] = useState(false);
+
+    let mounted = false;
+    useEffect(() => {
+        if (!mounted) {
+            getEpisodeAudioFromFile(podcastId, episode.id).then(async (file) => {
+                if (file && file.size === 0) {
+                    return;
+                }
+                setIsDownloaded(Boolean(file));
+            });
+        }
+
+        mounted = true;
+    }, [
+        mounted,
+        podcastId,
+        episode,
+        setIsDownloaded,
+    ]);
+
     return (
         <Stack>
             <Stack
@@ -47,10 +71,26 @@ export const EpisodeItem = (
                     podcastId={podcastId}
                     episode={episode}
                     >
-                    <EpisodeImage
-                        episode={episode}
-                        podcastId={podcastId}
-                    />
+                    <Badge
+                        badgeContent={
+                            isDownloaded ?
+                                (
+                                    <DownloadDoneIcon
+                                        sx={{
+                                            fontSize: "12px",
+                                        }}
+                                    />
+                                ) : null
+                        }
+                        color="secondary"
+                        overlap="circular"
+                        title="Episode downloaded"
+                    >
+                        <EpisodeImage
+                            episode={episode}
+                            podcastId={podcastId}
+                        />
+                    </Badge>
                 </EpisodeLink>
                 <Stack>
                     <EpisodeLink

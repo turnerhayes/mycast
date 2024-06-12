@@ -1,27 +1,21 @@
 "use client";
 
-import { ChangeEvent, FormEvent, ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import {
     ReadonlyURLSearchParams,
-    useRouter,
     useSearchParams,
-    useSelectedLayoutSegment,
     useSelectedLayoutSegments,
 } from "next/navigation";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Box from "@mui/material/Box"; 
-import InputAdornment from "@mui/material/InputAdornment"; 
-import TextField from "@mui/material/TextField"; 
 import Typography from "@mui/material/Typography";
-import { IconButton, SxProps, useTheme } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import { Container, IconButton, SxProps, useTheme } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useAppStore } from "@/lib/redux/hooks";
 import { RootState } from "@/lib/redux/store";
 import { getPodcast, getPodcastEpisode } from "@/lib/redux/selectors";
-import { BaseLink } from "../Links";
+import { BaseLink } from "@/app/components/Links";
 
 
 const BreadcrumbLink = (
@@ -76,7 +70,12 @@ const BreadcrumbComponent = (
     };
 
     return (
-        <Box>
+        <Container
+            disableGutters
+            sx={{
+                display: "flex",
+            }}
+        >
             {
                 isLast ? (
                     <Typography
@@ -101,7 +100,7 @@ const BreadcrumbComponent = (
                     </BreadcrumbLink>
                 )
             }
-        </Box>
+        </Container>
     );
 };
 
@@ -140,8 +139,6 @@ const getBreadcrumbItems = (
                 href: `/feed/${podcastId}`,
             },
         ];
-
-        console.log("layout segments:", layoutSegments);
 
         if (episode) {
             items.push(
@@ -183,27 +180,10 @@ export const AppHeader = (
         onToggleMenu: () => void;
     }
 ) => {
-    const [searchString, setSearchString] = useState("");
-
-    const router = useRouter();
     const state = useAppStore().getState();
     const segments = useSelectedLayoutSegments();
     
     const searchParams = useSearchParams();
-    const segment = useSelectedLayoutSegment();
-    useEffect(() => {
-        if (segment !== "search") {
-            return;
-        }
-        const query = searchParams.get("q");
-        if (query) {
-            setSearchString(query);
-        }
-    }, [
-        setSearchString,
-        segment,
-        searchParams,
-    ]);
 
     const breadcrumbItems = getBreadcrumbItems(segments, state, searchParams);
 
@@ -211,20 +191,6 @@ export const AppHeader = (
         text: "Home",
         href: "/",
     });
-
-    const handleSearchSubmit = useCallback((event: FormEvent) => {
-        event.preventDefault();
-        router.push(`/search?q=${encodeURIComponent(searchString)}`);
-    }, [
-        searchString,
-        router,
-    ]);
-
-    const handleSearchFieldChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-        setSearchString(event.target.value);
-    }, [
-        setSearchString,
-    ]);
 
     return (
         <AppBar
@@ -253,31 +219,6 @@ export const AppHeader = (
                         )
                     }
                 </Breadcrumbs>
-                <Box
-                    sx={{
-                        marginLeft: "auto",
-                    }}
-                >
-                    <form
-                        action="/search"
-                        onSubmit={handleSearchSubmit}
-                    >
-                        <TextField
-                            size="small"
-                            placeholder="Search podcasts"
-                            name="q"
-                            value={searchString}
-                            onChange={handleSearchFieldChange}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </form>
-                </Box>
             </Toolbar>
         </AppBar>
     );

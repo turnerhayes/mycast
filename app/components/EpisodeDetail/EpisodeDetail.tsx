@@ -164,8 +164,6 @@ export const EpisodeDetail = (
 
             const {body, headers} = response;
             
-            const totalBytes = Number(headers.get("content-length"));
-
             const reader = body?.getReader();
 
             if (!reader) {
@@ -201,26 +199,6 @@ export const EpisodeDetail = (
                 type: "download",
                 url: `/api/proxy/${encodeURIComponent(episode.enclosure.url)}`,
             });
-
-            // let bytesWritten = 0;
-            // while (true) {
-            //     const {done, value} = await reader.read();
-
-            //     if (done) {
-            //         break;
-            //     }
-
-            //     bytesWritten += value.byteLength;
-
-            //     setDownloadProgress((bytesWritten/totalBytes) * 100);
-
-            //     writable.write(value);
-            // }
-
-            // setIsDownloaded(true);
-            // setDownloadProgress(null);
-
-            // writable.close();
         }, [
             episode,
             setDownloadProgress,

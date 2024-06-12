@@ -1,1 +1,2 @@
-export { SearchResults } from "./PodcastSearch";
+export { PodcastSearch } from "./PodcastSearch";
+export { PodcastSearchField } from "./PodcastSearchField";

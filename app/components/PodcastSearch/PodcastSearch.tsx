@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import ListItemButton from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
+import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import LoadingButton from "@mui/lab/LoadingButton";
 import AddIcon from "@mui/icons-material/AddCircle";
@@ -21,6 +22,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { getPodcastByFeedUrl } from "@/lib/redux/selectors";
 import { Description } from "@/app/components/Description";
 import { ChangeOnHover } from "@/app/components/ChangeOnHover";
+import { PodcastSearchField } from "@/app/components/PodcastSearch/PodcastSearchField";
 
 
 const ExistingPodcastIcon = (
@@ -192,7 +194,6 @@ export const SearchResults = (
 
     const dispatch = useAppDispatch();
 
-
     const handleAddClick = useCallback(async (result: PodcastSearchResult) => {
         setProcessing([
             ...processing,
@@ -243,5 +244,24 @@ export const SearchResults = (
                 ))
             }
         </List>
+    );
+};
+
+export const PodcastSearch = (
+    {
+        searchString,
+    }: {
+        searchString: string;
+    }
+) => {
+    return (
+        <Stack>
+            <PodcastSearchField
+                fullWidth
+            />
+            <SearchResults
+                searchString={searchString}
+            />
+        </Stack>
     );
 };

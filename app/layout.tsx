@@ -1,9 +1,6 @@
-import Stack from "@mui/material/Stack";
-import Container from "@mui/material/Container";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { AppHeader } from "@/app/components/AppHeader";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import StoreProvider from "@/app/StoreProvider";
 import { App } from "@/app/App";
 

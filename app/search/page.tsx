@@ -1,9 +1,9 @@
-import { SearchResults } from "@/app/components/PodcastSearch";
+import { PodcastSearch } from "@/app/components/PodcastSearch/PodcastSearch";
 
 const SearchPage = ({searchParams: {q: query}}: {searchParams: {q: string;};}) => {
     return (
-        <SearchResults
-            searchString={query}
+        <PodcastSearch
+            searchString={query || ""}
         />
     );
 };
