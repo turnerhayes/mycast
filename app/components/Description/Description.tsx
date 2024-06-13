@@ -58,9 +58,8 @@ const processHTML = (node: Node): Child[] => {
         else {
             newChild = createElement(nodeName, {
                 key,
-                children: grandchildren,
                 ...attributes,
-            })
+            }, ...children)
         }
 
         children.push(newChild);
