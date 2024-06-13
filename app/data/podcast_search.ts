@@ -33,40 +33,39 @@ export const useSearchPodcasts = (
 ): PodcastSearchResults["searchForTerm"]["podcastSeries"]|null => {
     const hasSearch = Boolean(searchString.replace(/\s+/, ""));
     let data: PodcastSearchResults|undefined;
+    const query = gql`query SearchForTerm($searchString: String!) {
+        searchForTerm(
+            term: $searchString ,
+            filterForTypes: PODCASTSERIES,
+            searchResultsBoostType: BOOST_POPULARITY_A_LOT,
+        ){
+            searchId
+            podcastSeries{
+                uuid
+                name
+                description
+                rssUrl
+                imageUrl
+                totalEpisodesCount
+            }
+        }
+        }`;
+
+    let args: SuspenseQueryHookOptions|SkipToken = skipToken;
+    if (hasSearch && !USE_DUMMY) {
+        args = {
+            variables: {
+                searchString,
+            },
+        };
+    }
+
+    const queryResult = useSuspenseQuery<PodcastSearchResults>(query, args);
+
     if (USE_DUMMY) {
         data = DUMMY_SEARCH_RESULTS;
     }
     else {
-    
-        const query = gql`query SearchForTerm($searchString: String!) {
-            searchForTerm(
-                term: $searchString ,
-                filterForTypes: PODCASTSERIES,
-                searchResultsBoostType: BOOST_POPULARITY_A_LOT,
-            ){
-                searchId
-                podcastSeries{
-                    uuid
-                    name
-                    description
-                    rssUrl
-                    imageUrl
-                    totalEpisodesCount
-                }
-            }
-          }`;
-    
-        let args: SuspenseQueryHookOptions|SkipToken = skipToken;
-        if (hasSearch) {
-            args = {
-                variables: {
-                    searchString,
-                },
-            };
-        }
-    
-        const queryResult = useSuspenseQuery<PodcastSearchResults>(query, args);
-
         data = queryResult.data;
     }
     if (hasSearch) {

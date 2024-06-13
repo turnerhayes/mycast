@@ -6,7 +6,7 @@ import { Typography } from "@mui/material";
 import { getPodcast } from "@/lib/redux/selectors";
 
 const FeedPage = () => {
-    const podcast = useAppSelector((state) => getPodcast(state, {id: 0}));
+    const podcast = useAppSelector((state) => getPodcast(state, {id: "0"}));
 
     if (!podcast) {
         return (<Typography>

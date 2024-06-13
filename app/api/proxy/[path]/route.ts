@@ -1,8 +1,7 @@
-import { NextApiRequest } from "next";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 
-export async function GET(req: NextApiRequest, {params: {path}}: {params: {path: string;}}) {
+export async function GET(req: NextRequest, {params: {path}}: {params: {path: string;}}) {
     const response = await fetch(path);
 
     const headers = Object.fromEntries(response.headers.entries());

@@ -301,6 +301,7 @@ export const EpisodeDetail = (
                         customAdditionalControls={[
                             (
                                 <DownloadButton
+                                    key="download-button"
                                     downloadProgress={downloadProgress}
                                     isDownloaded={isDownloaded}
                                     onDownload={handleDownload}
