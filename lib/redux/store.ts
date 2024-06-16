@@ -3,10 +3,12 @@ import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import storage from "redux-persist/lib/storage";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import {PodcastSliceState, podcastReducer} from "./slices/podcast";
+import {PlaylistSliceState, playlistReducer} from "./slices/playlist";
 
 
 interface RootReducerState {
   podcast: PodcastSliceState;
+  playlist: PlaylistSliceState;
 }
 
 const persistedReducer = persistReducer<RootReducerState>({
@@ -15,6 +17,7 @@ const persistedReducer = persistReducer<RootReducerState>({
   stateReconciler: autoMergeLevel2,
 }, combineReducers({
   podcast: podcastReducer,
+  playlist: playlistReducer,
 }));
 
 export const makeStore = () => {

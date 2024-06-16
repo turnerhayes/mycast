@@ -87,6 +87,14 @@ export const App = (
                                     Search
                                 </BaseLink>
                             </ListItemButton>
+                            <ListItemButton>
+                                <BaseLink
+                                    component={Link}
+                                    href="/playlist"
+                                >
+                                    Playlist
+                                </BaseLink>
+                            </ListItemButton>
                         </List>
                     </Drawer>
                 </nav>

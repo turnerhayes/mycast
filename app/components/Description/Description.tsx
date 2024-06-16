@@ -9,6 +9,10 @@ const BANNED_TAGS = [
     "picture",
 ];
 
+const CHILDLESS_TAGS = [
+    "br",
+];
+
 type Child = string | ReactElement | ReactElement[];
 
 const processHTML = (node: Node): Child[] => {
@@ -56,10 +60,13 @@ const processHTML = (node: Node): Child[] => {
             );
         }
         else {
+            const nodeChildren = CHILDLESS_TAGS.includes(nodeName) ?
+                [] :
+                children;
             newChild = createElement(nodeName, {
                 key,
                 ...attributes,
-            }, ...children)
+            }, ...nodeChildren)
         }
 
         children.push(newChild);
