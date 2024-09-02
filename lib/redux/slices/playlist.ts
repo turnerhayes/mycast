@@ -1,9 +1,10 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Playlist, PodcastEpisodeId } from "@/app/playlist";
+import { CurrentlyPlayingEpisode, Playlist, PodcastEpisodeId } from "@/app/playlist";
 
 
 export interface PlaylistSliceState {
     defaultPlaylist: Playlist;
+    curentlyPlaying: CurrentlyPlayingEpisode|null;
 }
 
 const moveItem = (playlist: Playlist, from: number, to: number) => {
@@ -26,6 +27,7 @@ const initialState: PlaylistSliceState = {
     defaultPlaylist: {
         items: [],
     },
+    curentlyPlaying: null,
 };
 
 const playlistSlice = createSlice({
@@ -70,6 +72,13 @@ const playlistSlice = createSlice({
                 );
             }
         },
+
+        setCurrentlyPlaying(state, action: PayloadAction<CurrentlyPlayingEpisode|null>) {
+            state.curentlyPlaying = action.payload === null ? null : {
+                playlistId: action.payload.playlistId,
+                podcastEpisodeId: action.payload.podcastEpisodeId,
+            };
+        },
     },
 });
 
@@ -77,6 +86,7 @@ export const {
     addPlaylistItem,
     removePlaylistItem,
     movePlaylistItem,
+    setCurrentlyPlaying,
 } = playlistSlice.actions;
 
 export const playlistReducer = playlistSlice.reducer;

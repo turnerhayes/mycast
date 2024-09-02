@@ -22,7 +22,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setEpisodeProgress } from "@/lib/redux/slices/podcast";
 import { getEpisodeLastListenTime } from "@/lib/redux/selectors";
 import { getEpisodeAudioFromFile, getEpisodeFileHandle, removePodcastEpisodeFile } from "@/app/filesystem";
-import { addPlaylistItem } from "@/lib/redux/slices/playlist";
+import { addPlaylistItem, setCurrentlyPlaying } from "@/lib/redux/slices/playlist";
 import { DownloadWorkerMessageEvent, ProgressMessageData } from "./download-worker-types";
 
 import 'react-h5-audio-player/lib/styles.css';
@@ -369,6 +369,20 @@ export const EpisodeDetail = (
         episode,
     ]);
 
+    const handleSetAsCurrentlyPlaying = useCallback(() => {
+        dispatch(setCurrentlyPlaying({
+            podcastEpisodeId: {
+                podcastId: podcast.id,
+                episodeId: episode.id,
+            },
+            playlistId: "",
+        }));
+    }, [
+        dispatch,
+        podcast,
+        episode,
+    ]);
+
     return (
         <Stack>
             <Container
@@ -400,6 +414,10 @@ export const EpisodeDetail = (
                     {episode.title}
                 </Typography>
             </Container>
+            <PlaylistButton
+                onAddToPlaylist={handleAddToPlaylist}
+                onPlayNext={handleSetAsCurrentlyPlaying}
+            />
             <Paper
                 sx={{
                     marginTop: 1,

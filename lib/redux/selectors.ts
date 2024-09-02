@@ -132,3 +132,5 @@ export const isInDefaultPlaylist = createSelector(
             item.episodeId === podcastEpisodeId.episodeId
     ) >= 0
 );
+
+export const getCurrentlyPlaying = (state: RootState) => state.playlist.curentlyPlaying;

@@ -9,9 +9,12 @@ import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import { AppHeader } from "@/app/components/AppHeader";
+import { Player } from "@/app/components/Player";
+import { BaseLink } from "@/app/components/Links";
 import { ApolloWrapper } from "@/app/data/podcasts_client";
 import { themeOptions } from "@/app/theme";
-import { BaseLink } from "./components/Links";
+import { useAppSelector } from "@/lib/redux/hooks";
+import { getCurrentlyPlaying } from "@/lib/redux/selectors";
 
 export const App = (
     {
@@ -20,6 +23,7 @@ export const App = (
         children: ReactNode;
     }
 ) => {
+    const currentEpisode = useAppSelector(getCurrentlyPlaying);
     const theme = createTheme(themeOptions);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const handleToggleMenu = useCallback(() => {
@@ -100,7 +104,7 @@ export const App = (
                 </nav>
                 <AppHeader
                     onToggleMenu={handleToggleMenu}
-                    />
+                />
                 <Container
                     sx={{
                         marginTop: 1,
@@ -112,6 +116,13 @@ export const App = (
                         {children}
                     </ApolloWrapper>
                 </Container>
+                {
+                    currentEpisode === null ? null : (
+                        <Player
+                            currentEpisode={currentEpisode}
+                        />
+                    )
+                }
             </Stack>
         </ThemeProvider>
     );
