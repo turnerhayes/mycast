@@ -1,27 +1,72 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import H5AudioPlayer from "react-h5-audio-player";
+import { Button, ButtonGroup, ClickAwayListener, Grow, IconButton, MenuItem, MenuList, Popper } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import { Podcast, PodcastEpisode } from "@/app/podcast";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import PlayIcon from "@mui/icons-material/PlayArrow";
+import { EpisodeId, Podcast, PodcastEpisode, PodcastId } from "@/app/podcast";
 import { EpisodeImage } from "@/app/components/EpisodeImage";
 import { Description } from "@/app/components/Description";
-import { DownloadButton } from "@/app/components/DownloadButton";
-import { PlaylistButton } from "@/app/components/PlaylistButton";
-import PlayIcon from "@mui/icons-material/PlayArrow";
 import { DEFAULT_PLAYLIST_ID } from "@/app/playlist.d";
 import { getEpisodeAudioFromFile, removePodcastEpisodeFile } from "@/app/filesystem";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setEpisodeProgress } from "@/lib/redux/slices/podcast";
 import { getEpisodeLastListenTime } from "@/lib/redux/selectors";
-import { addAndPlayItem, addPlaylistItem } from "@/lib/redux/slices/playlist";
+import { addAndPlayItem, addPlaylistItem, clearPlaylist } from "@/lib/redux/slices/playlist";
 
 import 'react-h5-audio-player/lib/styles.css';
 
+
+const PlayButtons = (
+    {
+        podcastId,
+        episodeId,
+        onAddToPlaylist,
+    }: {
+        podcastId: PodcastId;
+        episodeId: EpisodeId;
+        onAddToPlaylist: () => void;
+    }
+) => {
+    const dispatch = useAppDispatch();
+
+    const handlePlayNowClick = useCallback(() => {
+        dispatch(clearPlaylist(DEFAULT_PLAYLIST_ID));
+        dispatch(addAndPlayItem({
+            playlistId: DEFAULT_PLAYLIST_ID,
+            episodeId: {
+                podcastId,
+                episodeId,
+            },
+        }));
+    }, [
+        dispatch,
+    ]);
+
+    return (
+        <ButtonGroup
+            variant="contained"
+            aria-label="Playlist add button"
+            sx={{
+                alignSelf: "center",
+            }}
+        >
+            <Button
+                onClick={handlePlayNowClick}
+            >
+                <PlayIcon />
+            </Button>
+            <Button onClick={onAddToPlaylist}>
+                <PlaylistAddIcon />
+            </Button>
+        </ButtonGroup>
+    );
+};
 
 export const EpisodeDetail = (
     {
@@ -153,11 +198,11 @@ export const EpisodeDetail = (
                     {episode.title}
                 </Typography>
             </Container>
-            <IconButton
-                onClick={handlePlayButtonClick}
-            >
-                <PlayIcon />
-            </IconButton>
+            <PlayButtons
+                podcastId={podcast.id}
+                episodeId={episode.id}
+                onAddToPlaylist={handleAddToPlaylist}
+            />
             <Paper
                 sx={{
                     marginTop: 1,
@@ -173,37 +218,6 @@ export const EpisodeDetail = (
                 >{
                         episode.description ?? ""
                     }</Description>
-                <Container
-                    sx={{
-                        marginTop: 2,
-                    }}
-                >
-                    <H5AudioPlayer
-                        ref={playerRef}
-                        header={
-                            <>
-                                {podcast.title} &mdash; {episode.title}
-                            </>
-                        }
-                        onListen={handleListen}
-                        customAdditionalControls={[
-                            (
-                                <DownloadButton
-                                    key="download-button"
-                                    podcast={podcast}
-                                    episode={episode}
-                                />
-                            ),
-                            (
-                                <PlaylistButton
-                                    key="playlist-button"
-                                    onAddToPlaylist={handleAddToPlaylist}
-                                    onPlayNext={handlePlayNext}
-                                />
-                            ),
-                        ]}
-                    ></H5AudioPlayer>
-                </Container>
             </Paper>
         </Stack>
     );

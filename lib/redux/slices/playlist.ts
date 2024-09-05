@@ -181,6 +181,12 @@ const playlistSlice = createSlice({
             }
         },
 
+        clearPlaylist(state, {payload: playlistId }: PayloadAction<PlaylistId>) {
+            if (playlistId === DEFAULT_PLAYLIST_ID) {
+                state.defaultPlaylist.items = [];
+            }
+        },
+
         movePlaylistItem(state, action: PayloadAction<{
             from: number;
             to: number;
@@ -243,6 +249,7 @@ export const {
     setCurrentlyPlaying,
     completePlaylistItem,
     addAndPlayItem,
+    clearPlaylist,
 } = playlistSlice.actions;
 
 export const playlistReducer = playlistSlice.reducer;
