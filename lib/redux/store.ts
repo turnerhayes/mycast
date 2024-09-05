@@ -4,7 +4,6 @@ import storage from "redux-persist/lib/storage";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import {PodcastSliceState, podcastReducer} from "./slices/podcast";
 import {PlaylistSliceState, playlistReducer} from "./slices/playlist";
-import { listenerMiddleware } from "./listeners";
 
 
 interface RootReducerState {
