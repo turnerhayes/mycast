@@ -30,7 +30,35 @@ const EpisodeTitle = (
         episode: PodcastEpisode;
     }
 ) => {
-    return `${podcast.title} — ${episode.title}`;
+    return (
+        <>
+            <Typography
+                title={podcast.title}
+                sx={{
+                    display: "inline-block",
+                    maxWidth: "40%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                }}
+            >
+                {podcast.title}
+            </Typography>
+            &mdash;
+            <Typography
+                title={episode.title}
+                sx={{
+                    display: "inline-block",
+                    maxWidth: "40%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                }}
+            >
+                {episode.title}
+            </Typography>
+        </>
+    );
 };
 
 export const Player = () => {
@@ -38,7 +66,7 @@ export const Player = () => {
     const router = useRouter();
     const playerRef = useRef<H5AudioPlayer|null>(null);
     const currentEpisode = useAppSelector(getCurrentlyPlaying)!;
-    const currentEpisodeRef = useRef<CurrentlyPlayingEpisode>(currentEpisode);
+    const currentEpisodeRef = useRef<CurrentlyPlayingEpisode>();
     const playlist = useAppSelector(
         (state) => getPlaylist(state, currentEpisode.playlistId)
     );
@@ -65,6 +93,7 @@ export const Player = () => {
             currentEpisodeRef.current?.index !== currentEpisode.index ||
             currentEpisodeRef.current?.playlistId !== currentEpisode.playlistId
         ) {
+            const hasCurrentEpisode = Boolean(currentEpisodeRef.current);
             getEpisodeAudioFromFile(podcast!.id, episode!.id).then(
                 async (file) => {
                     if (file && file.size === 0) {
@@ -83,7 +112,7 @@ export const Player = () => {
                     }
                     audioEl.src = url;
 
-                    if (currentEpisodeRef.current) {
+                    if (hasCurrentEpisode) {
                         if (!audioEl?.paused && !audioEl?.ended) {
                             audioEl?.pause();
                         }
@@ -189,16 +218,19 @@ export const Player = () => {
                         </EpisodeLink>
                         <IconButton
                             onClick={handleExpandClick}
-                            size="small"
                             sx={{
                                 marginLeft: "auto",
                             }}
                         >
                             {
                                 isExpanded ? (
-                                    <ExpandMoreIcon />
+                                    <ExpandMoreIcon
+                                        fontSize="small"
+                                    />
                                 ) : (
-                                    <ExpandLessIcon />
+                                    <ExpandLessIcon
+                                        fontSize="small"
+                                    />
                                 )
                             }
                         </IconButton>

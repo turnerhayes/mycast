@@ -65,9 +65,25 @@ const PlaylistItem = (
                 }
             </IconButton>
             
-            <ListItemText>
+            <ListItemText
+                primaryTypographyProps={{
+                    sx: {
+                        display: "flex",
+                    },
+                }}
+            >
                 <PodcastLink
                     podcastId={id.podcastId}
+                    title={
+                        podcastEpisodes[JSON.stringify(id)]!.podcast.title
+                    }
+                    sx={{
+                        maxWidth: "40%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        display: "inline-block",
+                    }}
                 >
                     {
                         podcastEpisodes[JSON.stringify(id)]!.podcast.title
@@ -77,6 +93,16 @@ const PlaylistItem = (
                 <EpisodeLink
                     podcastId={id.podcastId}
                     episodeId={id.episodeId}
+                    title={
+                        podcastEpisodes[JSON.stringify(id)]!.episode.title
+                    }
+                    sx={{
+                        maxWidth: "40%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        display: "inline-block",
+                    }}
                 >
                     {
                         podcastEpisodes[JSON.stringify(id)]!.episode.title
