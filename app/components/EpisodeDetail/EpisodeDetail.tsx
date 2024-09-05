@@ -1,206 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import H5AudioPlayer from "react-h5-audio-player";
 import Stack from "@mui/material/Stack";
-import { Button, ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper, SxProps, useTheme } from "@mui/material";
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
+import Paper from "@mui/material/Paper";
 import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import DownloadIcon from "@mui/icons-material/Download";
-import DownloadDoneIcon from "@mui/icons-material/DownloadDone";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import IconButton from "@mui/material/IconButton";
 import { Podcast, PodcastEpisode } from "@/app/podcast";
 import { EpisodeImage } from "@/app/components/EpisodeImage";
 import { Description } from "@/app/components/Description";
-import { ChangeOnHover } from "@/app/components/ChangeOnHover";
+import { DownloadButton } from "@/app/components/DownloadButton";
+import { PlaylistButton } from "@/app/components/PlaylistButton";
+import PlayIcon from "@mui/icons-material/PlayArrow";
+import { DEFAULT_PLAYLIST_ID } from "@/app/playlist.d";
+import { getEpisodeAudioFromFile, removePodcastEpisodeFile } from "@/app/filesystem";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setEpisodeProgress } from "@/lib/redux/slices/podcast";
 import { getEpisodeLastListenTime } from "@/lib/redux/selectors";
-import { getEpisodeAudioFromFile, getEpisodeFileHandle, removePodcastEpisodeFile } from "@/app/filesystem";
-import { addPlaylistItem, setCurrentlyPlaying } from "@/lib/redux/slices/playlist";
-import { DownloadWorkerMessageEvent, ProgressMessageData } from "./download-worker-types";
+import { addAndPlayItem, addPlaylistItem } from "@/lib/redux/slices/playlist";
 
 import 'react-h5-audio-player/lib/styles.css';
 
-
-const DownloadButton = (
-    {
-        isDownloaded,
-        downloadProgress,
-        onDownload,
-        onRemove,
-        sx,
-    }: {
-        isDownloaded: boolean;
-        downloadProgress: number | null;
-        onDownload: () => void;
-        onRemove: () => void;
-        sx?: SxProps;
-    }
-) => {
-    return (
-        <Box
-            sx={{
-                position: "relative",
-                ...sx,
-            }}
-        >
-            {
-                isDownloaded ? (
-                    <ChangeOnHover>
-                        <IconButton
-                            disabled
-                        >
-                            <DownloadDoneIcon
-                                color="action"
-                            />
-                        </IconButton>
-                        <IconButton
-                            className="hovered"
-                            onClick={onRemove}
-                        >
-                            <RemoveCircleIcon />
-                        </IconButton>
-                    </ChangeOnHover>
-                ) : (
-                    downloadProgress === null ? (
-                        <IconButton
-                            onClick={onDownload}
-                        >
-                            <DownloadIcon
-                            />
-                        </IconButton>
-                    ) : (
-                        <>
-                            <DownloadIcon
-                                sx={{
-                                    position: "absolute",
-                                    top: 8,
-                                    left: 8,
-                                }}
-                            />
-                            <CircularProgress
-                                variant="determinate"
-                                value={downloadProgress}
-                            >
-                            </CircularProgress>
-                        </>
-                    )
-                )
-            }
-        </Box>
-    );
-};
-
-const PlaylistButton = (
-    {
-        onAddToPlaylist,
-        onPlayNext,
-    }: {
-        onAddToPlaylist: () => void;
-        onPlayNext: () => void;
-    }
-) => {
-    const theme = useTheme();
-    const [open, setOpen] = useState(false);
-    const anchorRef = useRef<HTMLDivElement>(null);
-
-    const handleClose = useCallback((event: Event) => {
-        if (
-            anchorRef.current &&
-            anchorRef.current.contains(event.target as HTMLElement)
-        ) {
-            return;
-        }
-
-        setOpen(false);
-    }, [
-        setOpen,
-        anchorRef,
-    ]);
-
-    const handlePlayNextClick = useCallback(() => {
-        setOpen(false);
-        onPlayNext();
-    }, [
-        setOpen,
-        onPlayNext,
-    ]);
-
-    const handleToggle = useCallback(() => {
-        setOpen((prevOpen) => !prevOpen);
-    }, [
-        setOpen,
-    ]);
-
-    const menuId = useId();
-
-    const options = [
-        "Play last",
-        "Play next"
-    ];
-
-    return (
-        <>
-            <ButtonGroup
-                variant="contained"
-                ref={anchorRef}
-                aria-label="Playlist add button"
-            >
-                <IconButton onClick={onAddToPlaylist}>
-                    <PlaylistAddIcon />
-                </IconButton>
-                <Button
-                    size="small"
-                    aria-controls={open ? menuId : undefined}
-                    aria-expanded={open ? 'true' : undefined}
-                    aria-label="select merge strategy"
-                    aria-haspopup="menu"
-                    onClick={handleToggle}
-                >
-                    <ArrowDropDownIcon />
-                </Button>
-            </ButtonGroup>
-            <Popper
-                sx={{
-                    zIndex: 1,
-                }}
-                open={open}
-                anchorEl={anchorRef.current}
-                role={undefined}
-                transition
-                disablePortal
-            >
-                {({ TransitionProps, placement }) => (
-                    <Grow
-                        {...TransitionProps}
-                        style={{
-                            transformOrigin:
-                                placement === 'bottom' ? 'center top' : 'center bottom',
-                        }}
-                    >
-                        <Paper>
-                            <ClickAwayListener onClickAway={handleClose}>
-                                <MenuList id={menuId} autoFocusItem>
-                                    <MenuItem
-                                        onClick={(event) => handlePlayNextClick()}
-                                    >
-                                        Play Next
-                                    </MenuItem>
-                                </MenuList>
-                            </ClickAwayListener>
-                        </Paper>
-                    </Grow>
-                )}
-            </Popper>
-        </>
-    );
-};
 
 export const EpisodeDetail = (
     {
@@ -212,9 +33,6 @@ export const EpisodeDetail = (
     }
 ) => {
     const playerRef = useRef<H5AudioPlayer | null>(null);
-    const [isDownloaded, setIsDownloaded] = useState(false);
-    const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
-    const downloadWorkerRef = useRef<Worker>();
     const dispatch = useAppDispatch();
 
     const currentEpisodeProgress = useAppSelector((state) => getEpisodeLastListenTime(state, {
@@ -222,93 +40,34 @@ export const EpisodeDetail = (
         episodeId: episode.id,
     }));
 
-    let mounted = false;
     useEffect(() => {
-        if (!mounted) {
-            getEpisodeAudioFromFile(podcast.id, episode.id).then(async (file) => {
-                if (file && file.size === 0) {
-                    await removePodcastEpisodeFile(podcast.id, episode.id);
-                    return;
-                }
-                setIsDownloaded(Boolean(file));
-                const url = file ?
-                    URL.createObjectURL(file) :
-                    episode.enclosure.url;
-                const audioEl = playerRef.current?.audio.current;
-                if (!audioEl) {
-                    return;
-                }
-                audioEl.src = url;
-            });
+        getEpisodeAudioFromFile(podcast.id, episode.id).then(async (file) => {
+            if (file && file.size === 0) {
+                await removePodcastEpisodeFile(podcast.id, episode.id);
+                return;
+            }
+            const url = file ?
+                URL.createObjectURL(file) :
+                episode.enclosure.url;
+            const audioEl = playerRef.current?.audio.current;
+            if (!audioEl) {
+                return;
+            }
+            audioEl.src = url;
+        });
 
-            if (currentEpisodeProgress) {
-                const audioRef = playerRef.current?.audio.current;
-                if (audioRef) {
-                    audioRef.currentTime = currentEpisodeProgress;
-                }
+        if (currentEpisodeProgress) {
+            const audioRef = playerRef.current?.audio.current;
+            if (audioRef) {
+                audioRef.currentTime = currentEpisodeProgress;
             }
         }
-
-        mounted = true;
     }, [
-        mounted,
         podcast,
         episode,
-        setIsDownloaded,
+        currentEpisodeProgress,
     ]);
 
-
-    const downloadEpisodeAudio = useCallback(
-        async (episode: PodcastEpisode, fileHandle: FileSystemFileHandle) => {
-            downloadWorkerRef.current = new Worker(
-                new URL("./download-worker.ts", import.meta.url)
-            );
-            setDownloadProgress(0);
-            const response = await fetch(`/api/proxy/${encodeURIComponent(episode.enclosure.url)}`);
-
-            const { body, headers } = response;
-
-            const reader = body?.getReader();
-
-            if (!reader) {
-                throw new Error("Can't get body reader for episode audio");
-            }
-
-            const writable = await fileHandle.createWritable();
-            writable.truncate(0);
-
-            downloadWorkerRef.current.onmessage = (
-                event: DownloadWorkerMessageEvent
-            ) => {
-                if (event.data.type === "progress") {
-                    const { data } = event as MessageEvent<ProgressMessageData>;
-                    setDownloadProgress(data.percentDone);
-
-                    writable.write(data.value);
-                    return;
-                }
-
-                if (event.data.type === "download-done") {
-                    setIsDownloaded(true);
-                    setDownloadProgress(null);
-
-                    writable.close();
-                    downloadWorkerRef.current?.terminate();
-                    downloadWorkerRef.current = undefined;
-                    return;
-                }
-            };
-
-            downloadWorkerRef.current.postMessage({
-                type: "download",
-                url: `/api/proxy/${encodeURIComponent(episode.enclosure.url)}`,
-            });
-        }, [
-        episode,
-        setDownloadProgress,
-        setIsDownloaded,
-    ]
-    );
 
     const handleListen = useCallback((event: Event) => {
         const { currentTime } = event.target as HTMLAudioElement;
@@ -320,27 +79,7 @@ export const EpisodeDetail = (
     }, [
         podcast,
         episode,
-    ]);
-
-    const handleDownload = useCallback(async () => {
-        await removePodcastEpisodeFile(podcast.id, episode.id);
-        const handle = await getEpisodeFileHandle(podcast.id, episode.id, true);
-        if (!handle) {
-            throw new Error(`Unable to get file handle for episode ${episode.id}`);
-        }
-        await downloadEpisodeAudio(episode, handle);
-    }, [
-        podcast,
-        episode,
-    ]);
-
-    const handleRemove = useCallback(async () => {
-        await removePodcastEpisodeFile(podcast.id, episode.id);
-        setIsDownloaded(false);
-    }, [
-        podcast,
-        episode,
-        setIsDownloaded,
+        dispatch,
     ]);
 
     const handleAddToPlaylist = useCallback(() => {
@@ -369,18 +108,18 @@ export const EpisodeDetail = (
         episode,
     ]);
 
-    const handleSetAsCurrentlyPlaying = useCallback(() => {
-        dispatch(setCurrentlyPlaying({
-            podcastEpisodeId: {
+    const handlePlayButtonClick = useCallback(() => {
+        dispatch(addAndPlayItem({
+            playlistId: DEFAULT_PLAYLIST_ID,
+            episodeId: {
                 podcastId: podcast.id,
                 episodeId: episode.id,
             },
-            playlistId: "",
         }));
     }, [
         dispatch,
-        podcast,
         episode,
+        podcast,
     ]);
 
     return (
@@ -414,10 +153,11 @@ export const EpisodeDetail = (
                     {episode.title}
                 </Typography>
             </Container>
-            <PlaylistButton
-                onAddToPlaylist={handleAddToPlaylist}
-                onPlayNext={handleSetAsCurrentlyPlaying}
-            />
+            <IconButton
+                onClick={handlePlayButtonClick}
+            >
+                <PlayIcon />
+            </IconButton>
             <Paper
                 sx={{
                     marginTop: 1,
@@ -450,14 +190,13 @@ export const EpisodeDetail = (
                             (
                                 <DownloadButton
                                     key="download-button"
-                                    downloadProgress={downloadProgress}
-                                    isDownloaded={isDownloaded}
-                                    onDownload={handleDownload}
-                                    onRemove={handleRemove}
+                                    podcast={podcast}
+                                    episode={episode}
                                 />
                             ),
                             (
                                 <PlaylistButton
+                                    key="playlist-button"
                                     onAddToPlaylist={handleAddToPlaylist}
                                     onPlayNext={handlePlayNext}
                                 />

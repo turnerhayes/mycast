@@ -23,6 +23,7 @@ import { getPodcastByFeedUrl } from "@/lib/redux/selectors";
 import { Description } from "@/app/components/Description";
 import { ChangeOnHover } from "@/app/components/ChangeOnHover";
 import { PodcastSearchField } from "@/app/components/PodcastSearch/PodcastSearchField";
+import Image from "next/image";
 
 
 const ExistingPodcastIcon = (
@@ -123,7 +124,7 @@ const SearchResultItem = (
         onToggleExpanded(result);
     }, [
         onToggleExpanded,
-        isExpanded,
+        result,
     ]);
 
     return (
@@ -136,7 +137,7 @@ const SearchResultItem = (
                     alignSelf: "start",
                 }}
             >
-                <img
+                <Image
                     src={result.imageUrl}
                     alt={`Image for "${result.name}" podcast`}
                     width={50}

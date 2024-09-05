@@ -1,11 +1,23 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { CurrentlyPlayingEpisode, Playlist, PodcastEpisodeId } from "@/app/playlist";
+import { CurrentlyPlayingEpisode, DEFAULT_PLAYLIST_ID, Playlist, PlaylistId, PodcastEpisodeId } from "@/app/playlist.d";
 
 
 export interface PlaylistSliceState {
     defaultPlaylist: Playlist;
     curentlyPlaying: CurrentlyPlayingEpisode|null;
 }
+
+type PlaylistIndexOrEpisodeId = {
+    playlistId?: string;
+} & (
+    {
+        index: number;
+        id?: never;
+    } | {
+        index?: never;
+        id: PodcastEpisodeId;
+    }
+);
 
 const moveItem = (playlist: Playlist, from: number, to: number) => {
     const [item] = playlist.items.splice(from, 1);
@@ -23,6 +35,83 @@ const moveItem = (playlist: Playlist, from: number, to: number) => {
     return playlist;
 };
 
+const _removePlaylistItem = ({
+    state,
+    playlistId,
+    index,
+}: {
+    state: PlaylistSliceState;
+    playlistId: string;
+    index: number;
+}) => {
+    const playlist = playlistId ?
+        state.defaultPlaylist : // TODO: handle non-default playlist
+        state.defaultPlaylist;
+
+    if (!playlistId) {
+        playlist.items.splice(index, 1);
+    }
+};
+
+const _setCurrentlyPlaying = (
+    {
+        state,
+        currentlyPlaying,
+    }: {
+        state: PlaylistSliceState;
+        currentlyPlaying: CurrentlyPlayingEpisode|null;
+    }
+) => {
+    state.curentlyPlaying = currentlyPlaying;
+};
+
+const _addPlaylistItem = (
+    {
+        state,
+        playlistId,
+        episodeId,
+    }: {
+        state: PlaylistSliceState;
+        playlistId: PlaylistId;
+        episodeId: PodcastEpisodeId;
+    }
+) => {
+    if (playlistId === DEFAULT_PLAYLIST_ID) {
+        state.defaultPlaylist.items.push(episodeId);
+        return state.defaultPlaylist.items.length - 1;
+    }
+
+    // TODO: support non-default playlists
+    return 0;
+};
+
+const getIndex = (
+    {
+        playlist,
+        index,
+        id,
+    }: {
+        playlist: Playlist;
+    } & (
+        {
+            index: number;
+            id?: never;
+        } | {
+            index?: never;
+            id: PodcastEpisodeId;
+        }
+    )
+) => {
+    if (index !== undefined) {
+        return index;
+    }
+
+    return playlist.items.findIndex(
+        (item) => item.episodeId === id!.episodeId &&
+            item.podcastId === id!.podcastId
+    );
+};
+
 const initialState: PlaylistSliceState = {
     defaultPlaylist: {
         items: [],
@@ -38,21 +127,57 @@ const playlistSlice = createSlice({
             episodeId: PodcastEpisodeId;
             playlistId?: string;
         }>) {
-            const {episodeId, playlistId} = action.payload;
+            const {
+                episodeId,
+                playlistId = DEFAULT_PLAYLIST_ID,
+            } = action.payload;
 
-            if (!playlistId) {
-                state.defaultPlaylist.items.push(episodeId);
-            }
+            _addPlaylistItem({
+                state,
+                episodeId,
+                playlistId,
+            });
         },
 
-        removePlaylistItem(state, action: PayloadAction<{
-            index: number;
-            playlistId?: string;
+        addAndPlayItem(state, action: PayloadAction<{
+            episodeId: PodcastEpisodeId;
+            playlistId: PlaylistId;
         }>) {
-            const {index, playlistId} = action.payload;
+            const {episodeId, playlistId} = action.payload;
+
+            const index = _addPlaylistItem({
+                state,
+                playlistId,
+                episodeId,
+            });
+
+            _setCurrentlyPlaying({
+                state,
+                currentlyPlaying: {
+                    playlistId,
+                    index,
+                },
+            });
+        },
+
+        removePlaylistItem(state, action: PayloadAction<PlaylistIndexOrEpisodeId>) {
+            const {playlistId, ...indexOrId} = action.payload;
+
+            const playlist = playlistId ?
+                state.defaultPlaylist : // TODO: handle non-default playlist
+                state.defaultPlaylist;
+
+            const index = getIndex({
+                playlist,
+                ...indexOrId,
+            });
+
+            if (index < 0) {
+                throw new Error(`Playlist item not found: ${indexOrId}`);
+            }
 
             if (!playlistId) {
-                state.defaultPlaylist.items.splice(index, 1);
+                playlist.items.splice(index, 1);
             }
         },
 
@@ -74,10 +199,39 @@ const playlistSlice = createSlice({
         },
 
         setCurrentlyPlaying(state, action: PayloadAction<CurrentlyPlayingEpisode|null>) {
-            state.curentlyPlaying = action.payload === null ? null : {
-                playlistId: action.payload.playlistId,
-                podcastEpisodeId: action.payload.podcastEpisodeId,
-            };
+            _setCurrentlyPlaying({
+                state,
+                currentlyPlaying: action.payload,
+            });
+        },
+
+        completePlaylistItem(state, action: PayloadAction<{
+            playlistId: string;
+            index: number;
+        }>) {
+            const { playlistId, index } = action.payload;
+
+            const playlist = playlistId ?
+                state.defaultPlaylist : // TODO: handle non-default playlists
+                state.defaultPlaylist;
+
+            const nextIndex = index < playlist.items.length - 1 ?
+                index + 1 :
+                null;
+            
+            _removePlaylistItem({
+                state,
+                playlistId,
+                index,
+            });
+
+            _setCurrentlyPlaying({
+                state,
+                currentlyPlaying: nextIndex ? {
+                    playlistId,
+                    index: nextIndex,
+                } : null,
+            });
         },
     },
 });
@@ -87,6 +241,8 @@ export const {
     removePlaylistItem,
     movePlaylistItem,
     setCurrentlyPlaying,
+    completePlaylistItem,
+    addAndPlayItem,
 } = playlistSlice.actions;
 
 export const playlistReducer = playlistSlice.reducer;
