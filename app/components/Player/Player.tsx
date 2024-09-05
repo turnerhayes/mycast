@@ -15,7 +15,7 @@ import { Podcast, PodcastEpisode } from "@/app/podcast";
 import { getEpisodeAudioFromFile, removePodcastEpisodeFile } from "@/app/filesystem";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { getCurrentlyPlaying, getEpisodeLastListenTime, getPlaylist, getPodcast, getPodcastEpisode } from "@/lib/redux/selectors";
-import { completePlaylistItem } from "@/lib/redux/slices/playlist";
+import { completePlaylistItem, setCurrentlyPlaying } from "@/lib/redux/slices/playlist";
 import { setEpisodeProgress } from "@/lib/redux/slices/podcast";
 
 import 'react-h5-audio-player/lib/styles.css';
@@ -173,6 +173,36 @@ export const Player = () => {
         currentEpisode.index,
     ]);
 
+    const handlePreviousClick = useCallback(() => {
+        const currentIndex = currentEpisode.index;
+        if (currentIndex === 0) {
+            return;
+        }
+        dispatch(setCurrentlyPlaying({
+            playlistId: DEFAULT_PLAYLIST_ID,
+            index: currentIndex - 1,
+        }));
+    }, [
+        currentEpisode.index,
+        dispatch,
+    ]);
+
+    const handleNextClick = useCallback(() => {
+        const currentIndex = currentEpisode.index;
+
+        if (currentIndex === playlist.items.length - 1) {
+            return;
+        }
+
+        dispatch(setCurrentlyPlaying({
+            playlistId: DEFAULT_PLAYLIST_ID,
+            index: currentIndex + 1,
+        }));
+    }, [
+        currentEpisode.index,
+        dispatch,
+    ]);
+
     if (!podcast) {
         return (
             <Typography>
@@ -238,6 +268,8 @@ export const Player = () => {
                 }
                 onListen={handleListen}
                 onEnded={handleEnded}
+                onClickPrevious={handlePreviousClick}
+                onClickNext={handleNextClick}
                 customControlsSection={
                     isExpanded ? [
                         RHAP_UI.ADDITIONAL_CONTROLS,
