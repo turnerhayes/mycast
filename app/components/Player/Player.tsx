@@ -44,16 +44,6 @@ export const Player = () => {
     );
     const episodeId = playlist.items[currentEpisode.index];
 
-    const handleChangePlayingEpisode = useCallback(() => {
-        const audioEl = playerRef.current?.audio.current;
-        if (!audioEl?.paused && !audioEl?.ended) {
-            audioEl?.pause();
-        }
-        audioEl?.play();
-    }, [
-        playerRef,
-    ]);
-
     const currentEpisodeProgress = useAppSelector(
         (state) => getEpisodeLastListenTime(
             state,
