@@ -43,20 +43,15 @@ export const EpisodeItem = (
 ) => {
     const [isDownloaded, setIsDownloaded] = useState(false);
 
-    let mounted = false;
     useEffect(() => {
-        if (!mounted) {
-            getEpisodeAudioFromFile(podcastId, episode.id).then(async (file) => {
-                if (file && file.size === 0) {
-                    return;
-                }
-                setIsDownloaded(Boolean(file));
-            });
-        }
+        getEpisodeAudioFromFile(podcastId, episode.id).then(async (file) => {
+            if (file && file.size === 0) {
+                return;
+            }
+            setIsDownloaded(Boolean(file));
+        });
 
-        mounted = true;
     }, [
-        mounted,
         podcastId,
         episode,
         setIsDownloaded,
