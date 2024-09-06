@@ -119,7 +119,6 @@ export const App = (
                 {
                     currentEpisode === null ? null : (
                         <Player
-                            currentEpisode={currentEpisode}
                         />
                     )
                 }

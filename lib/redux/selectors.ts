@@ -1,8 +1,13 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "@/lib/redux/store";
 import { EpisodeId, Podcast, PodcastEpisode, PodcastId } from "@/app/podcast";
-import { PodcastEpisodeId } from "@/app/playlist";
+import { PlaylistId, PodcastEpisodeId } from "@/app/playlist";
 
+
+export type PlaylistEpisodeDict = Record<string, {
+    podcast: Podcast;
+    episode: PodcastEpisode;
+}>;
 
 /** Podcasts **/
 
@@ -11,7 +16,7 @@ export const getPodcasts = (state: RootState) => state.podcast.items;
 export const getPodcast = createSelector(
     [
         getPodcasts,
-        (state: RootState, params: {id: PodcastId;}) => params.id,
+        (_state: RootState, params: {id: PodcastId;}) => params.id,
     ],
     (podcasts, id) => podcasts.find((podcast) => podcast.id === id)
 );
@@ -19,7 +24,7 @@ export const getPodcast = createSelector(
 export const getPodcastByFeedUrl = createSelector(
     [
         getPodcasts,
-        (state: RootState, params: {url: string;}) => params.url,
+        (_state: RootState, params: {url: string;}) => params.url,
     ],
     (podcasts, url) => podcasts.find((podcast) => podcast.feedUrl === url)
 );
@@ -27,7 +32,7 @@ export const getPodcastByFeedUrl = createSelector(
 export const getPodcastEpisode = createSelector(
     [
         getPodcast,
-        (state: RootState, params: {episodeId: EpisodeId;}) => params.episodeId,
+        (_state: RootState, params: {episodeId: EpisodeId;}) => params.episodeId,
     ],
     (podcast, episodeId) => podcast?.episodes.find((ep) => ep.id === episodeId)
 );
@@ -35,7 +40,7 @@ export const getPodcastEpisode = createSelector(
 const getEpisodeProgress = createSelector(
     [
         (state: RootState) => state.podcast.podcastProgress,
-        (state: RootState, params: {
+        (_state: RootState, params: {
             podcastId: PodcastId;
             episodeId: EpisodeId;
         }) => params,
@@ -47,7 +52,7 @@ const getEpisodeProgress = createSelector(
 export const getPodcastEpisodeProgress = createSelector(
     [
         (state: RootState) => state.podcast.podcastProgress,
-        (state: RootState, params: {
+        (_state: RootState, params: {
             podcastId: PodcastId;
         }) => params.podcastId,
     ],
@@ -80,13 +85,13 @@ export const getPodcastDict = createSelector(
         },
         {} as Record<PodcastId, Podcast>
     )
-)
+);
 
 export const getPodcastEpisodes = createSelector(
     [
         getPodcastDict,
         (
-            state: RootState,
+            _state: RootState,
             podcastEpisodeIds: PodcastEpisodeId[]
         ) => podcastEpisodeIds
     ],
@@ -104,10 +109,7 @@ export const getPodcastEpisodes = createSelector(
 
             return dict;
         },
-        {} as Record<string, {
-            podcast: Podcast;
-            episode: PodcastEpisode;
-        }>
+        {} as PlaylistEpisodeDict
     )
 );
 
@@ -115,11 +117,16 @@ export const getPodcastEpisodes = createSelector(
 
 export const getDefaultPlaylist = (state: RootState) => state.playlist.defaultPlaylist;
 
+export const getPlaylist = (state: RootState, playlistId: PlaylistId) => {
+    // TODO: support non-default playlist
+    return state.playlist.defaultPlaylist;
+};
+
 export const isInDefaultPlaylist = createSelector(
     [
         getDefaultPlaylist,
         (
-            state: RootState,
+            _state: RootState,
             {
                 podcastEpisodeId
             }: {
