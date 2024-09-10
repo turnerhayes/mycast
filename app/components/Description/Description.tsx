@@ -69,6 +69,7 @@ const processHTML = (node: Node): Child[] => {
             }, ...nodeChildren)
         }
 
+        // debugger;
         children.push(newChild);
     }
 
@@ -85,6 +86,7 @@ export const Description = (
     }
 ) => {
     const parser = new DOMParser();
+    debugger;
     const parsed = parser.parseFromString(children, "text/html");
 
     return (

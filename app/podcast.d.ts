@@ -51,6 +51,7 @@ export interface Podcast {
     image?: FeedImage;
     categories: PodcastCategory[];
     episodes: PodcastEpisode[];
+    lastRefreshTimestamp: number;
 }
 
 export interface PodcastEpisodeProgress {

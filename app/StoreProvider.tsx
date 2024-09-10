@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import { Provider } from 'react-redux';
-import { makeStore, AppStore, makeStoreWithPersistor } from '../lib/redux/store';
+import { AppStore, makeStoreWithPersistor } from '../lib/redux/store';
 import { addPodcast } from '@/lib/redux/slices/podcast';
 import { parseFeed } from './podcast-parser';
 import { Podcast } from './podcast';

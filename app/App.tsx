@@ -16,6 +16,8 @@ import { themeOptions } from "@/app/theme";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { getCurrentlyPlaying } from "@/lib/redux/selectors";
 
+import "./feed-refresh/feed-refresh";
+
 export const App = (
     {
         children,

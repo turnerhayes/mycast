@@ -40,15 +40,22 @@ export const makeStore = () => {
   });
 };
 
+let storeInstance: ReturnType<typeof makeStore>|undefined = undefined;
+let persistorInstance: ReturnType<typeof persistStore>|undefined = undefined;
+
 export const makeStoreWithPersistor = () => {
-  const store = makeStore();
-  const persistor = persistStore(store);
+  if (!storeInstance) {
+    storeInstance = makeStore();
+    persistorInstance = persistStore(storeInstance);
+  }
 
   return {
-    store,
-    persistor,
+    store: storeInstance,
+    persistor: persistorInstance,
   };
 };
+
+export const getStore = () => storeInstance;
 
 // Infer the type of makeStore
 export type AppStore = ReturnType<typeof makeStore>;

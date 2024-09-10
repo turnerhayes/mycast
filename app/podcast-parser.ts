@@ -79,6 +79,7 @@ class PodcastParser {
             categories,
             episodes,
             image: feedImage,
+            lastRefreshTimestamp: Date.now(),
         };
 
         console.log("parsed podcast:", podcast);

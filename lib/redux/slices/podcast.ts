@@ -53,9 +53,30 @@ const podcastSlice = createSlice({
             state.podcastProgress[podcastId].episodes[episodeId]
                 .lastListenTime = lastListenTime;
         },
+
+        updatePodcasts(state, {payload}: PayloadAction<Podcast[]>) {
+            for (const podcast of payload) {
+                const index = state.items.findIndex((p) => p.feedUrl === podcast.feedUrl);
+                if (index < 0) {
+                    throw new Error(
+                        `Unable to update podcast; podcast not currently added (feed URL: ${
+                            podcast.feedUrl
+                        })`
+                    );
+                }
+                else {
+                    state.items[index] = podcast;
+                }
+            }
+        }
     },
 });
 
-export const {addPodcast, removePodcast, setEpisodeProgress} = podcastSlice.actions;
+export const {
+    addPodcast,
+    removePodcast,
+    setEpisodeProgress,
+    updatePodcasts,
+} = podcastSlice.actions;
 
 export const podcastReducer = podcastSlice.reducer;
