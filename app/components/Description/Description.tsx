@@ -72,7 +72,6 @@ const processHTML = (node: Node): Child[] => {
         children.push(newChild);
     }
 
-    console.log("Description:> processHTML:> children:", children);
     return children;
 };
 
@@ -85,17 +84,13 @@ export const Description = (
         typographyProps?: TypographyProps;
     }
 ) => {
-    console.log("Description:> children:", children);
     const processed = useMemo(() => {
         const parser = new DOMParser();
         const parsed = parser.parseFromString(children, "text/html");
-        console.log("Description:> parsed:", parsed);
         return processHTML(parsed.body);
     }, [
         children,
     ]);
-
-    console.log("Description:> processed:", processed);
 
     return (
         <Typography
