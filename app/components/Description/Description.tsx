@@ -1,4 +1,4 @@
-import { ReactElement, createElement } from "react";
+import { ReactElement, createElement, useMemo } from "react";
 import Typography, {TypographyProps} from "@mui/material/Typography";
 import { BaseLink } from "../Links";
 
@@ -62,7 +62,7 @@ const processHTML = (node: Node): Child[] => {
         else {
             const nodeChildren = CHILDLESS_TAGS.includes(nodeName) ?
                 [] :
-                children;
+                grandchildren || [];
             newChild = createElement(nodeName, {
                 key,
                 ...attributes,
@@ -72,6 +72,7 @@ const processHTML = (node: Node): Child[] => {
         children.push(newChild);
     }
 
+    console.log("Description:> processHTML:> children:", children);
     return children;
 };
 
@@ -84,15 +85,24 @@ export const Description = (
         typographyProps?: TypographyProps;
     }
 ) => {
-    const parser = new DOMParser();
-    const parsed = parser.parseFromString(children, "text/html");
+    console.log("Description:> children:", children);
+    const processed = useMemo(() => {
+        const parser = new DOMParser();
+        const parsed = parser.parseFromString(children, "text/html");
+        console.log("Description:> parsed:", parsed);
+        return processHTML(parsed.body);
+    }, [
+        children,
+    ]);
+
+    console.log("Description:> processed:", processed);
 
     return (
         <Typography
             component="div"
             {...typographyProps}
         >
-            {processHTML(parsed.body)}
+            {processed}
         </Typography>
     );
 };

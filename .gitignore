@@ -38,3 +38,4 @@ next-env.d.ts
 # podcast subscription file
 *.opml
 certificates
+*storybook.log
